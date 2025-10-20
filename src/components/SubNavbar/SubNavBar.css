@@ -1,0 +1,28 @@
+.subnavbar {
+  background: #fff;
+   border-top: 1px solid #eee;  
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.subnav-menu {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  padding: 15px 30px;
+  margin: 0;
+} 
+
+.subnav-menu li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.subnav-menu li a:hover {
+  color: #ff5722; 
+}
