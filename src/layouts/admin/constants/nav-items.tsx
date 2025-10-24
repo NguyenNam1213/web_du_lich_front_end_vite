@@ -51,7 +51,7 @@ export const getUsersIcon = () => (
 export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
   {
     label: "Dashboard",
-    href: "/admin/dashboard-user",
+    href: "/admin/dashboard",
     icon: getDashboardIcon(),
   },
   {
@@ -71,12 +71,12 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
   },
   {
     label: "Country",
-    href: "/admin/countries",
+    href: "/admin/country",
     icon: <Flag className="text-gray-700 w-5 h-5" />,
   },
   {
     label: "City",
-    href: "/admin/cities",
+    href: "/admin/city",
     icon: <Building2 className="text-gray-700 w-5 h-5" />,
   },
   {
