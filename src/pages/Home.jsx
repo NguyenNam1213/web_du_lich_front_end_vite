@@ -11,7 +11,6 @@ const Home = () => {
       <SubNavbar></SubNavbar>
       <Background></Background>
       <DealsAndHighLights></DealsAndHighLights>
-      {/* <AdminLayout /> */}
     </div>
   );
 };
