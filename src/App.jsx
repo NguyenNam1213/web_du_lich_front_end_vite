@@ -6,6 +6,7 @@ import Profile from "./pages/Profile/Profile";
 import AdminLayout from "./layouts/admin/admin-layout";
 import ManageUser from "./layouts/admin/pages/manage-user";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AllRouter from "./components/AllRouter/AllRouter";
 
 const App = () => {
   return (
@@ -18,6 +19,8 @@ const App = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="user" element={<ManageUser />} />
         </Route>
+
+        <Route path="/*" element={<AllRouter />} />
       </Routes>
     </Router>
   );

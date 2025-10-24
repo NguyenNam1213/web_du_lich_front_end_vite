@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@tailwindcss/vite": "^4.1.15",
+    "antd": "^5.27.6",
     "axios": "^1.12.2",
     "lucide-react": "^0.546.0",
     "react": "^19.1.1",
