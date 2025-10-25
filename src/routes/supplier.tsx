@@ -6,6 +6,7 @@ const Dashboard = lazy(() => import("../pages/supplier/Dashboard"));
 const Activities = lazy(() => import("../pages/supplier/Activities"));
 const Image = lazy(() => import("../pages/supplier/Image"));
 const Booking = lazy(() => import("../pages/supplier/Booking"));
+const LoginSupplier = lazy(() => import("../components/Supplier/LoginSupplier"))
 
 export const routeSupplier: RouteObject[] = [
     {
@@ -29,5 +30,9 @@ export const routeSupplier: RouteObject[] = [
                 element: <Booking />,
             },
         ],
+    },
+    {
+        path: "/supplier/login",
+        element: <LoginSupplier />,
     },
 ];
