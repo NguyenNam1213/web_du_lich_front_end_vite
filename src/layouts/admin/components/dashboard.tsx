@@ -1,9 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { getStats, Stats } from "../../../services/api/statsApi";
+import {
+  getStats,
+  Stats,
+  getBookingStats,
+  BookingStats,
+  getActivityStats,
+  ActivityStats,
+} from "../../../services/api/statsApi";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface StatCardProps {
   title: string;
-  value: number;
+  value: number | string;
   icon: string;
   color: string;
   subtitle?: string;
@@ -21,10 +43,10 @@ const StatCard: React.FC<StatCardProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className={`text-3xl font-bold ${color}`}>{value.toLocaleString()}</p>
-          {subtitle && (
-            <p className="text-xs text-gray-500 mt-2">{subtitle}</p>
-          )}
+          <p className={`text-3xl font-bold ${color}`}>
+            {typeof value === "number" ? value.toLocaleString() : value}
+          </p>
+          {subtitle && <p className="text-xs text-gray-500 mt-2">{subtitle}</p>}
         </div>
         <div className={`text-4xl ${color} opacity-80`}>{icon}</div>
       </div>
@@ -50,20 +72,51 @@ const Section: React.FC<SectionProps> = ({ title, children }) => {
   );
 };
 
+const COLORS = [
+  "#3b82f6", // blue
+  "#10b981", // green
+  "#f59e0b", // amber
+  "#ef4444", // red
+  "#8b5cf6", // purple
+  "#ec4899", // pink
+  "#06b6d4", // cyan
+  "#f97316", // orange
+];
+
+const statusColorMap: Record<string, string> = {
+  pending: "#f59e0b",
+  confirmed: "#3b82f6",
+  completed: "#10b981",
+  cancelled: "#ef4444",
+  active: "#10b981",
+  inactive: "#ef4444",
+  draft: "#6b7280",
+};
+
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [bookingStats, setBookingStats] = useState<BookingStats | null>(null);
+  const [activityStats, setActivityStats] = useState<ActivityStats | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchStats();
+    fetchAllStats();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchAllStats = async () => {
     try {
       setLoading(true);
-      const data = await getStats();
-      setStats(data);
+      const [statsData, bookingData, activityData] = await Promise.all([
+        getStats(),
+        getBookingStats(),
+        getActivityStats(),
+      ]);
+      setStats(statsData);
+      setBookingStats(bookingData);
+      setActivityStats(activityData);
       setError(null);
     } catch (err) {
       setError("Không thể tải dữ liệu thống kê");
@@ -99,6 +152,296 @@ export const Dashboard: React.FC = () => {
             Tổng quan hệ thống quản lý du lịch
           </p>
         </div>
+
+        {/* Booking Statistics */}
+        {stats.bookings && (
+          <Section title="📅 Thống kê đặt chỗ">
+            <StatCard
+              title="Tổng đặt chỗ"
+              value={stats.bookings.total}
+              icon="📝"
+              color="text-blue-600"
+            />
+            <StatCard
+              title="Đang chờ"
+              value={stats.bookings.pending}
+              icon="⏳"
+              color="text-amber-600"
+            />
+            <StatCard
+              title="Đã xác nhận"
+              value={stats.bookings.confirmed}
+              icon="✅"
+              color="text-green-600"
+            />
+            <StatCard
+              title="Doanh thu"
+              value={`$${stats.bookings.revenue.toLocaleString()}`}
+              icon="💰"
+              color="text-emerald-600"
+            />
+          </Section>
+        )}
+
+        {/* Booking Charts */}
+        {bookingStats && (
+          <div className="mb-8 space-y-6">
+            {/* Booking Status Pie Chart and Trend Line Chart */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Booking by Status */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Phân bổ đặt chỗ theo trạng thái
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={bookingStats.byStatus}
+                      dataKey="count"
+                      nameKey="status"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label={(entry) => `${entry.status}: ${entry.count}`}
+                    >
+                      {bookingStats.byStatus.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            statusColorMap[entry.status] ||
+                            COLORS[index % COLORS.length]
+                          }
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Booking Trend (30 days) */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Xu hướng đặt chỗ (30 ngày qua)
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={bookingStats.trend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(value) => {
+                        const date = new Date(value);
+                        return `${date.getMonth() + 1}/${date.getDate()}`;
+                      }}
+                    />
+                    <YAxis />
+                    <Tooltip
+                      labelFormatter={(value) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("vi-VN");
+                      }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      name="Số đặt chỗ"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Revenue Trend and Monthly Stats */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Revenue Trend */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Xu hướng doanh thu (30 ngày qua)
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={bookingStats.revenueTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(value) => {
+                        const date = new Date(value);
+                        return `${date.getMonth() + 1}/${date.getDate()}`;
+                      }}
+                    />
+                    <YAxis />
+                    <Tooltip
+                      labelFormatter={(value) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("vi-VN");
+                      }}
+                      formatter={(value: number) => [
+                        `$${value.toLocaleString()}`,
+                        "Doanh thu",
+                      ]}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                      name="Doanh thu"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Monthly Stats */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Thống kê theo tháng (6 tháng qua)
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={bookingStats.byMonth}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis yAxisId="left" orientation="left" />
+                    <YAxis yAxisId="right" orientation="right" />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      yAxisId="left"
+                      dataKey="count"
+                      fill="#3b82f6"
+                      name="Số đặt chỗ"
+                    />
+                    <Bar
+                      yAxisId="right"
+                      dataKey="revenue"
+                      fill="#10b981"
+                      name="Doanh thu"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Activity Statistics */}
+        {activityStats && (
+          <div className="mb-8 space-y-6">
+            <h2 className="text-xl font-semibold text-gray-800 pb-2 border-b-2 border-gray-200">
+              🎯 Thống kê hoạt động
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Activity by Status */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Hoạt động theo trạng thái
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={activityStats.byStatus}
+                      dataKey="count"
+                      nameKey="status"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label={(entry) => `${entry.status}: ${entry.count}`}
+                    >
+                      {activityStats.byStatus.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            statusColorMap[entry.status] ||
+                            COLORS[index % COLORS.length]
+                          }
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Top Activities */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Top 10 hoạt động phổ biến
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={activityStats.topActivities}
+                    layout="horizontal"
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      width={150}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="bookingCount"
+                      fill="#8b5cf6"
+                      name="Số lượt đặt"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Activity by Category */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Hoạt động theo danh mục
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={activityStats.byCategory}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="categoryName"
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                    />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="count" fill="#06b6d4" name="Số hoạt động" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Activity by Destination */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Hoạt động theo điểm đến
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={activityStats.byDestination}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="destinationName"
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                    />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="count" fill="#f97316" name="Số hoạt động" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* User Statistics */}
         <Section title="👥 Thống kê người dùng">
@@ -201,9 +544,7 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="text-center">
               <p className="text-4xl font-bold">
-                {Math.round(
-                  (stats.users.active / stats.users.total) * 100
-                )}%
+                {Math.round((stats.users.active / stats.users.total) * 100)}%
               </p>
               <p className="text-gray-300 mt-2">Tỷ lệ người dùng hoạt động</p>
             </div>
@@ -219,4 +560,3 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
-

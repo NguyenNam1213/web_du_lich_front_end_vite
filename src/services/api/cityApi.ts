@@ -36,3 +36,4 @@ export const deleteCity = async (id: string): Promise<void> => {
   await api.delete(`/cities/${id}`);
 };
 
+
