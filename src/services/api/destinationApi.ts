@@ -41,3 +41,4 @@ export const deleteDestination = async (id: string): Promise<void> => {
   await api.delete(`/destinations/${id}`);
 };
 
+

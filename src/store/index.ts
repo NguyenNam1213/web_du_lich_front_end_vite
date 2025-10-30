@@ -4,6 +4,7 @@ import userReducer from "./slices/userSlice";
 import cityReducer from "./slices/citySlice";
 import countryReducer from "./slices/countrySlice";
 import destinationReducer from "./slices/destinationSlice";
+import supplierReducer from "./slices/supplierSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     cities: cityReducer,
     countries: countryReducer,
     destinations: destinationReducer,
+    suppliers: supplierReducer,
   },
 });
 
