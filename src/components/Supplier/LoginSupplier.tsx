@@ -16,7 +16,7 @@ export default function LoginSupplier() {
 
     try {
       const res = await AuthService.login({ email, password });
-      console.log("Login response:", res);
+      // console.log("Login response:", res);
       localStorage.setItem("access_token", res.access_token);
     //   localStorage.setItem("user", JSON.stringify(res.user));
       localStorage.setItem("user", JSON.stringify({ email }));
