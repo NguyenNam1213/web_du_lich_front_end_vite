@@ -1,10 +1,21 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import { X } from "lucide-react"; // Giả sử sử dụng lucide-react cho icon X
 
-export default function Modal() {
+export default function Modal({
+  isModalOpen,
+  setIsModalOpen,
+  title,
+  fields,
+  onSave,
+}) {
   return (
     <Transition appear show={isModalOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={setIsModalOpen}>
+      <Dialog
+        as="div"
+        className="relative z-50"
+        onClose={() => setIsModalOpen(false)}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-200"
@@ -29,7 +40,7 @@ export default function Modal() {
           >
             <Dialog.Panel className="w-full max-w-md bg-white rounded-lg shadow-lg border border-gray-200">
               <Dialog.Title className="flex items-center justify-between px-6 py-4 border-b">
-                <h3 className="text-lg font-semibold">Edit User</h3>
+                <h3 className="text-lg font-semibold">{title}</h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="p-1 hover:bg-gray-100 rounded-lg"
@@ -39,56 +50,34 @@ export default function Modal() {
               </Dialog.Title>
 
               <div className="px-6 py-4 space-y-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData?.firstName ?? ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData!,
-                        firstName: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData?.lastName ?? ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData!,
-                        lastName: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    value={formData?.phone ?? ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData!,
-                        phone: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
+                {fields.map((field) => (
+                  <div key={field.name}>
+                    <label className="block text-sm font-medium mb-1">
+                      {field.label}
+                    </label>
+                    {field.type === "select" ? (
+                      <select
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      >
+                        {field.options?.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.type || "text"}
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder={field.placeholder || ""}
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
 
               <div className="flex justify-end gap-3 px-6 py-4 border-t">
@@ -99,7 +88,7 @@ export default function Modal() {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSave}
+                  onClick={onSave}
                   className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                 >
                   Save

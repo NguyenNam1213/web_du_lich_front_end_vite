@@ -3,134 +3,117 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchUsers,
-  createUserAsync,
-  updateUserAsync,
-  deleteUserAsync,
-} from "../../../store/slices/userSlice";
+  fetchSuppliers,
+  createSupplierAsync,
+  updateSupplierAsync,
+  deleteSupplierAsync,
+} from "../../../store/slices/supplierSlice";
 import { RootState, AppDispatch } from "../../../store/index";
-import { User } from "../../admin/types/user.type";
+import { Supplier } from "../../admin/types/supplier.type";
 import { Trash2, Edit2, X } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import Pagination from "../components/pagination";
 
-const getRoleColor = (role: string) => {
-  switch (role) {
-    case "admin":
-      return "bg-red-100 text-red-800";
-    case "customer":
-      return "bg-gray-100 text-gray-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "active":
-      return "bg-green-100 text-green-800";
-    case "inactive":
-      return "bg-red-100 text-red-800";
-    case "suspended":
-      return "bg-yellow-100 text-yellow-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-export default function UserManagementTable() {
+export default function SupplierManagementTable() {
   const dispatch = useDispatch<AppDispatch>();
   const {
-    users = [],
+    suppliers = [],
     status,
     error,
-    currentPage,
-    totalPages,
-  } = useSelector((state: RootState) => state.users || {});
+  } = useSelector((state: RootState) => state.suppliers || {});
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState<Partial<User>>({
-    email: "",
-    firstName: "",
-    lastName: "",
+  const [formData, setFormData] = useState<Partial<Supplier>>({
+    companyName: "",
+    businessEmail: "",
     phone: "",
-    avatar: "",
-    role: "customer",
-    status: "active",
+    address: "",
+    commissionRate: 15,
+    userId: "",
   });
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editingSupplierId, setEditingSupplierId] = useState<string | null>(
+    null
+  );
 
-  // Lấy danh sách người dùng khi component mount
+  // Lấy danh sách suppliers khi component mount
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchUsers({ page: 1 }));
+      dispatch(fetchSuppliers());
     }
   }, [dispatch, status]);
 
-  const handleEdit = (user: User) => {
-    setFormData({ ...user });
-    setEditingUserId(user.id);
+  const handleEdit = (supplier: Supplier) => {
+    setFormData({
+      ...supplier,
+      userId: supplier.userId.toString(),
+    });
+    setEditingSupplierId(supplier.id);
     setIsModalOpen(true);
   };
 
   const handleCreate = () => {
     setFormData({
-      email: "",
-      firstName: "",
-      lastName: "",
+      companyName: "",
+      businessEmail: "",
       phone: "",
-      avatar: "",
-      role: "customer",
-      status: "active",
+      address: "",
+      commissionRate: 15,
+      userId: "",
     });
-    setEditingUserId(null);
+    setEditingSupplierId(null);
     setIsModalOpen(true);
   };
 
   const handleSave = async () => {
-    if (formData) {
-      if (editingUserId) {
-        // Sửa người dùng
+    if (formData && formData.companyName && formData.userId) {
+      const dataToSend = {
+        ...formData,
+        userId: Number(formData.userId),
+      };
+
+      if (editingSupplierId) {
+        // Sửa supplier
         await dispatch(
-          updateUserAsync({ id: editingUserId, userData: formData })
+          updateSupplierAsync({
+            id: editingSupplierId,
+            supplierData: dataToSend,
+          })
         );
       } else {
-        // Thêm người dùng
-        await dispatch(createUserAsync(formData));
+        // Thêm supplier
+        await dispatch(createSupplierAsync(dataToSend));
       }
       setIsModalOpen(false);
       setFormData({
-        email: "",
-        firstName: "",
-        lastName: "",
+        companyName: "",
+        businessEmail: "",
         phone: "",
-        avatar: "",
-        role: "customer",
-        status: "active",
+        address: "",
+        commissionRate: 15,
+        userId: "",
       });
-      setEditingUserId(null);
-      // Tải lại trang hiện tại
-      dispatch(fetchUsers({ page: currentPage }));
+      setEditingSupplierId(null);
+      // Tải lại danh sách
+      dispatch(fetchSuppliers());
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa người dùng này không?")) {
-      await dispatch(deleteUserAsync(id));
-      dispatch(fetchUsers({ page: currentPage }));
+    if (confirm("Bạn có chắc chắn muốn xóa supplier này không?")) {
+      await dispatch(deleteSupplierAsync(id));
+      dispatch(fetchSuppliers());
     }
   };
 
   return (
     <>
-      {/* Nút thêm người dùng */}
+      {/* Nút thêm supplier */}
       <div className="mb-4">
         <button
           onClick={handleCreate}
           className="px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors shadow-sm"
         >
-          Thêm Người Dùng
+          Thêm Supplier
         </button>
       </div>
 
@@ -144,17 +127,21 @@ export default function UserManagementTable() {
           <thead>
             <tr className="bg-gray-100">
               <th className="px-6 py-3 text-left text-sm font-medium">ID</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Họ</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Tên</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Tên công ty
+              </th>
               <th className="px-6 py-3 text-left text-sm font-medium">Email</th>
               <th className="px-6 py-3 text-left text-sm font-medium">
                 Điện thoại
               </th>
               <th className="px-6 py-3 text-left text-sm font-medium">
-                Vai trò
+                Địa chỉ
               </th>
               <th className="px-6 py-3 text-left text-sm font-medium">
-                Trạng thái
+                Hoa hồng (%)
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Người dùng
               </th>
               <th className="px-6 py-3 text-center text-sm font-medium">
                 Hành động
@@ -162,44 +149,42 @@ export default function UserManagementTable() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user: User) => (
+            {suppliers.map((supplier: Supplier) => (
               <tr
-                key={user.id}
+                key={supplier.id}
                 className="border-b border-gray-200 hover:bg-gray-50"
               >
-                <td className="px-6 py-3 text-sm">{user.id}</td>
-                <td className="px-6 py-3 text-sm">{user.firstName || ""}</td>
-                <td className="px-6 py-3 text-sm">{user.lastName || ""}</td>
-                <td className="px-6 py-3 text-sm">{user.email}</td>
-                <td className="px-6 py-3 text-sm">{user.phone || ""}</td>
-                <td className="px-6 py-3 text-sm">
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${getRoleColor(
-                      user.role
-                    )}`}
-                  >
-                    {user.role}
-                  </span>
+                <td className="px-6 py-3 text-sm">{supplier.id}</td>
+                <td className="px-6 py-3 text-sm font-medium">
+                  {supplier.companyName}
                 </td>
                 <td className="px-6 py-3 text-sm">
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                      user.status
-                    )}`}
-                  >
-                    {user.status}
-                  </span>
+                  {supplier.businessEmail || "-"}
+                </td>
+                <td className="px-6 py-3 text-sm">{supplier.phone || "-"}</td>
+                <td className="px-6 py-3 text-sm max-w-xs truncate">
+                  {supplier.address || "-"}
+                </td>
+                <td className="px-6 py-3 text-sm">
+                  {supplier.commissionRate}%
+                </td>
+                <td className="px-6 py-3 text-sm">
+                  {supplier.user
+                    ? `${supplier.user.firstName || ""} ${
+                        supplier.user.lastName || ""
+                      } (${supplier.user.email})`
+                    : `User ID: ${supplier.userId}`}
                 </td>
                 <td className="px-6 py-3 text-sm text-center">
                   <button
-                    onClick={() => handleEdit(user)}
+                    onClick={() => handleEdit(supplier)}
                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                     title="Chỉnh sửa"
                   >
                     <Edit2 size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(user.id)}
+                    onClick={() => handleDelete(supplier.id)}
                     className="p-2 text-gray-500 hover:bg-gray-100 hover:text-red-600 rounded-lg transition-colors"
                     title="Xóa"
                   >
@@ -212,10 +197,7 @@ export default function UserManagementTable() {
         </table>
       </div>
 
-      {/* Thanh phân trang */}
-      <Pagination currentPage={currentPage} totalPages={totalPages} />
-
-      {/* Modal chỉnh sửa/thêm người dùng */}
+      {/* Modal chỉnh sửa/thêm supplier */}
       <Transition appear show={isModalOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -247,7 +229,7 @@ export default function UserManagementTable() {
               <Dialog.Panel className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200">
                 <Dialog.Title className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {editingUserId ? "Chỉnh sửa Người dùng" : "Thêm Người dùng"}
+                    {editingSupplierId ? "Chỉnh sửa Supplier" : "Thêm Supplier"}
                   </h3>
                   <button
                     onClick={() => setIsModalOpen(false)}
@@ -260,13 +242,16 @@ export default function UserManagementTable() {
                 <div className="px-6 py-4 space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Email
+                      Tên công ty <span className="text-red-500">*</span>
                     </label>
                     <input
-                      type="email"
-                      value={formData.email}
+                      type="text"
+                      value={formData.companyName}
                       onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
+                        setFormData({
+                          ...formData,
+                          companyName: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
                       required
@@ -275,30 +260,21 @@ export default function UserManagementTable() {
 
                   <div>
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Họ
+                      Email công ty
                     </label>
                     <input
-                      type="text"
-                      value={formData.firstName ?? ""}
+                      type="email"
+                      value={formData.businessEmail ?? ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
+                        setFormData({
+                          ...formData,
+                          businessEmail: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Tên
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.lastName ?? ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
-                    />
-                  </div>
+
                   <div>
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
                       Điện thoại
@@ -312,55 +288,54 @@ export default function UserManagementTable() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
                     />
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Ảnh đại diện
+                      Địa chỉ
+                    </label>
+                    <textarea
+                      value={formData.address ?? ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, address: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      Hoa hồng (%)
                     </label>
                     <input
-                      type="text"
-                      value={formData.avatar ?? ""}
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      value={formData.commissionRate ?? 15}
                       onChange={(e) =>
-                        setFormData({ ...formData, avatar: e.target.value })
+                        setFormData({
+                          ...formData,
+                          commissionRate: parseFloat(e.target.value),
+                        })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
                     />
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Vai trò
+                      User ID <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      value={formData.role}
+                    <input
+                      type="number"
+                      value={formData.userId ?? ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, role: e.target.value })
+                        setFormData({ ...formData, userId: e.target.value })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors bg-white"
-                    >
-                      <option value="customer">Customer</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Trạng thái
-                    </label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          status: e.target.value as
-                            | "active"
-                            | "inactive"
-                            | "suspended",
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors bg-white"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                      <option value="suspended">Suspended</option>
-                    </select>
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
+                      required
+                    />
                   </div>
                 </div>
 

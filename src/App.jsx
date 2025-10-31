@@ -6,7 +6,16 @@ import Profile from "./pages/Profile/Profile";
 import AdminLayout from "./layouts/admin/admin-layout";
 import ManageUser from "./layouts/admin/pages/manage-user";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import AllRouter from "./components/AllRouter/AllRouter";
+
+import ManageCountry from "./layouts/admin/pages/manage-country";
+import ManageCity from "./layouts/admin/pages/manage-city";
+import ManageDestination from "./layouts/admin/pages/manage-destination";
+import ManageSupplier from "./layouts/admin/pages/manage-supplier";
+import DashboardPage from "./layouts/admin/pages/dashboard";
+import { Counter } from "./layouts/admin/pages/counter-test";
+
 
 const App = () => {
   return (
@@ -17,7 +26,14 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
           <Route path="user" element={<ManageUser />} />
+          <Route path="supplier" element={<ManageSupplier />} />
+          <Route path="country" element={<ManageCountry />} />
+          <Route path="city" element={<ManageCity />} />
+          <Route path="destinations" element={<ManageDestination />} />
+          <Route path="test" element={<Counter />} />
         </Route>
 
         <Route path="/*" element={<AllRouter />} />
