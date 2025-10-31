@@ -54,6 +54,7 @@ const SupplierLayout = () => {
     { label: "Dashboard", path: "/supplier", icon: <LayoutDashboard size={18} /> },
     { label: "Activities", path: "/supplier/activities", icon: <Calendar size={18} /> },
     { label: "Images", path: "/supplier/image", icon: <ImageIcon size={18} /> },
+    { label: "Schedules", path: "/supplier/schedules", icon: <Calendar size={18} /> },
     { label: "Bookings", path: "/supplier/booking", icon: <ShoppingBag size={18} /> },
   ];
 

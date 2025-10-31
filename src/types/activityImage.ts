@@ -1,10 +1,7 @@
-import { Activity } from "./activity";
-
 export interface ActivityImage {
-  id: number;
+  id?: number;
   activityId: number;
   imageUrl: string;
-  isPrimary: boolean;
-  sortOrder: number;
-  activity?: Activity;
+  isPrimary?: boolean;
+  sortOrder?: number;
 }

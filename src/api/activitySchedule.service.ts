@@ -1,23 +1,25 @@
+import { AxiosResponse } from "axios";
 import { ActivitySchedule } from "../types/activitySchedule";
 import instance from "./api";
 
 export const ActivityScheduleService = {
-  async getByActivityId(activityId: number): Promise<ActivitySchedule[]> {
-    const res = await instance.get(`/activities/${activityId}/schedules`);
-    return res.data;
+  // GET /activities/:id/schedules
+  getAll(activityId: number): Promise<AxiosResponse<ActivitySchedule[]>> {
+    return instance.get(`/activities/${activityId}/schedules`);
   },
 
-  async create(activityId: number, data: Partial<ActivitySchedule>): Promise<ActivitySchedule> {
-    const res = await instance.post(`/activities/${activityId}/schedules`, data);
-    return res.data;
+  // POST /activities/:id/schedules
+  create(activityId: number, data: Omit<ActivitySchedule, "id" | "activityId">) {
+    return instance.post(`/activities/${activityId}/schedules`, data);
   },
 
-  async update(id: number, data: Partial<ActivitySchedule>): Promise<ActivitySchedule> {
-    const res = await instance.put(`/activity-schedules/${id}`, data);
-    return res.data;
+  // PATCH /activities/:activityId/schedules/:id
+  update(activityId: number, id: number, data: Partial<ActivitySchedule>) {
+    return instance.patch(`/activities/${activityId}/schedules/${id}`, data);
   },
 
-  async delete(id: number): Promise<void> {
-    await instance.delete(`/activity-schedules/${id}`);
+  // DELETE /activities/:activityId/schedules/:id
+  delete(activityId: number, id: number) {
+    return instance.delete(`/activities/${activityId}/schedules/${id}`);
   },
 };

@@ -1,28 +1,27 @@
+import { AxiosResponse } from "axios";
 import { Activity } from "../types/activity";
 import instance from "./api";
 
+const BASE_URL = "/activities";
+
 export const ActivityService = {
-  async getAll(): Promise<Activity[]> {
-    const res = await instance.get("/activities");
-    return res.data;
+  getAll(): Promise<AxiosResponse<Activity[]>> {
+    return instance.get(BASE_URL);
   },
 
-  async getById(id: number): Promise<Activity> {
-    const res = await instance.get(`/activities/${id}`);
-    return res.data;
+  getById(id: number): Promise<AxiosResponse<Activity>> {
+    return instance.get(`${BASE_URL}/${id}`);
   },
 
-  async create(data: Partial<Activity>): Promise<Activity> {
-    const res = await instance.post("/activities", data);
-    return res.data;
+  create(data: Activity): Promise<AxiosResponse<Activity>> {
+    return instance.post(BASE_URL, data);
   },
 
-  async update(id: number, data: Partial<Activity>): Promise<Activity> {
-    const res = await instance.put(`/activities/${id}`, data);
-    return res.data;
+  update(id: number, data: Partial<Activity>): Promise<AxiosResponse<Activity>> {
+    return instance.patch(`${BASE_URL}/${id}`, data);
   },
 
-  async delete(id: number): Promise<void> {
-    await instance.delete(`/activities/${id}`);
+  delete(id: number): Promise<AxiosResponse<{ message: string }>> {
+    return instance.delete(`${BASE_URL}/${id}`);
   },
 };

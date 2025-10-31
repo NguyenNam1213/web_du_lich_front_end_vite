@@ -1,20 +1,25 @@
+import { AxiosResponse } from "axios";
 import { ActivityImage } from "../types/activityImage";
 import instance from "./api";
 
 export const ActivityImageService = {
-  async getByActivityId(activityId: number): Promise<ActivityImage[]> {
-    const res = await instance.get(`/activities/${activityId}/images`);
-    return res.data;
+  // GET /activities/:id/images
+  getAll(activityId: number): Promise<AxiosResponse<ActivityImage[]>> {
+    return instance.get(`/activities/${activityId}/images`);
   },
 
-  async upload(activityId: number, data: FormData): Promise<ActivityImage> {
-    const res = await instance.post(`/activities/${activityId}/images`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return res.data;
+  // POST /activities/:id/images
+  create(activityId: number, data: Omit<ActivityImage, "id" | "activityId">) {
+    return instance.post(`/activities/${activityId}/images`, data);
   },
 
-  async delete(imageId: number): Promise<void> {
-    await instance.delete(`/activity-images/${imageId}`);
+  // PATCH /activities/:activityId/images/:id
+  update(activityId: number, id: number, data: Partial<ActivityImage>) {
+    return instance.patch(`/activities/${activityId}/images/${id}`, data);
+  },
+
+  // DELETE /activities/:activityId/images/:id
+  delete(activityId: number, id: number) {
+    return instance.delete(`/activities/${activityId}/images/${id}`);
   },
 };
