@@ -4,8 +4,8 @@ import SupplierLayout from "../layouts/supplier/SupplierLayout";
 
 const Dashboard = lazy(() => import("../pages/supplier/Dashboard"));
 const Activities = lazy(() => import("../pages/supplier/Activities"));
-const Image = lazy(() => import("../pages/supplier/Image"));
-const Schedule = lazy(() => import("../pages/supplier/Schedules"));
+const ActivityImages = lazy(() => import("../pages/supplier/ActivityImages"));
+const ActivitySchedules = lazy(() => import("../pages/supplier/ActivitySchedules"));
 const Booking = lazy(() => import("../pages/supplier/Booking"));
 const LoginSupplier = lazy(() => import("../components/Supplier/LoginSupplier"))
 
@@ -24,11 +24,11 @@ export const routeSupplier: RouteObject[] = [
             },
             {
                 path: "image",
-                element: <Image />,
+                element: <ActivityImages />,
             },
             {
                 path: "schedules",
-                element: <Schedule />,
+                element: <ActivitySchedules />,
             },
             {
                 path: "booking",
@@ -36,8 +36,8 @@ export const routeSupplier: RouteObject[] = [
             },
         ],
     },
-    {
-        path: "/supplier/login",
-        element: <LoginSupplier />,
-    },
+    // {
+    //     path: "/supplier/login",
+    //     element: <LoginSupplier />,
+    // },
 ];
