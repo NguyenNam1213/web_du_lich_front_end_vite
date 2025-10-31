@@ -25,7 +25,7 @@ const SupplierLayout = () => {
 
     // Nếu chưa đăng nhập → chuyển hướng về trang login
     if (!token || !storedUser) {
-      navigate("/login", { replace: true });
+      navigate("/supplier/login", { replace: true });
       return;
     }
 
@@ -39,7 +39,7 @@ const SupplierLayout = () => {
     } catch (error) {
       console.error("Error parsing user data:", error);
       localStorage.removeItem("user");
-      navigate("/login", { replace: true });
+      navigate("/supplier/login", { replace: true });
     }
   }, [navigate]);
 
@@ -47,7 +47,7 @@ const SupplierLayout = () => {
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
-    navigate("/login", { replace: true });
+    navigate("/supplier/login", { replace: true });
   };
 
   const menuItems = [

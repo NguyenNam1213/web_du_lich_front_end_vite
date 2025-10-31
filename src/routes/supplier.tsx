@@ -36,8 +36,8 @@ export const routeSupplier: RouteObject[] = [
             },
         ],
     },
-    // {
-    //     path: "/supplier/login",
-    //     element: <LoginSupplier />,
-    // },
+    {
+        path: "/supplier/login",
+        element: <LoginSupplier />,
+    },
 ];
