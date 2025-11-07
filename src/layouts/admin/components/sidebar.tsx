@@ -7,9 +7,10 @@ import { Link, NavLink } from "react-router-dom";
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  unreadNotifications?: boolean;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, unreadNotifications = false }: SidebarProps) {
   return (
     <>
       {isOpen && (
@@ -36,7 +37,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         <nav className="p-4 space-y-2">
-          {getNavItems(false).map((item) => (
+          {getNavItems(unreadNotifications).map((item) => (
             <NavLink
               key={item.href}
               to={item.href}
