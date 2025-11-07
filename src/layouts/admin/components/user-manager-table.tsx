@@ -14,6 +14,7 @@ import { Trash2, Edit2, X } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Pagination from "../components/pagination";
+import { getUsers } from "../../../services/api/userApi";
 
 const getRoleColor = (role: string) => {
   switch (role) {
@@ -60,6 +61,7 @@ export default function UserManagementTable() {
     status: "active",
   });
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   // Lấy danh sách người dùng khi component mount
   useEffect(() => {
@@ -122,15 +124,90 @@ export default function UserManagementTable() {
     }
   };
 
+  const handleExportCsv = async () => {
+    try {
+      setExporting(true);
+      const headers = [
+        "ID",
+        "First Name",
+        "Last Name",
+        "Email",
+        "Phone",
+        "Role",
+        "Status",
+        "Created At",
+      ];
+
+      const escapeCsv = (value: unknown) => {
+        const str = value === null || value === undefined ? "" : String(value);
+        if (/[",\n\r]/.test(str)) {
+          return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+      };
+
+      const LIMIT = 100;
+      const first = await getUsers(1, LIMIT);
+      const allUsers: User[] = [...(first.users as unknown as User[])];
+      for (let p = 2; p <= first.totalPages; p++) {
+        const pageData = await getUsers(p, LIMIT);
+        allUsers.push(...(pageData.users as unknown as User[]));
+      }
+
+      const rows = allUsers.map((u: User) => [
+        escapeCsv(u.id),
+        escapeCsv(u.firstName ?? ""),
+        escapeCsv(u.lastName ?? ""),
+        escapeCsv(u.email),
+        escapeCsv(u.phone ?? ""),
+        escapeCsv(u.role),
+        escapeCsv(u.status),
+        escapeCsv((u as any).createdAt ?? ""),
+      ]);
+
+      const csvContent = [headers, ...rows]
+        .map((r) => r.join(","))
+        .join("\r\n");
+      const blob = new Blob(["\uFEFF" + csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const timestamp = new Date().toISOString().replace(/[:\.]/g, "-");
+      link.href = url;
+      link.download = `users_all_${timestamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert("Xuất CSV thất bại. Vui lòng thử lại.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <>
-      {/* Nút thêm người dùng */}
-      <div className="mb-4">
+      {/* Hành động */}
+      <div className="mb-4 flex gap-2">
         <button
           onClick={handleCreate}
           className="px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors shadow-sm"
         >
           Thêm Người Dùng
+        </button>
+        <button
+          onClick={handleExportCsv}
+          disabled={exporting}
+          className={`px-4 py-2 text-sm border rounded-lg transition-colors shadow-sm ${
+            exporting
+              ? "text-gray-400 bg-white border-gray-200 cursor-not-allowed"
+              : "text-gray-700 bg-white border-gray-300 hover:bg-gray-50"
+          }`}
+          title="Xuất CSV toàn bộ người dùng"
+        >
+          {exporting ? "Đang xuất..." : "Xuất CSV"}
         </button>
       </div>
 

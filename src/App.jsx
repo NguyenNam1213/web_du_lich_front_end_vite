@@ -12,6 +12,7 @@ import ManageDestination from "./layouts/admin/pages/manage-destination";
 import ManageSupplier from "./layouts/admin/pages/manage-supplier";
 import DashboardPage from "./layouts/admin/pages/dashboard";
 import { Counter } from "./layouts/admin/pages/counter-test";
+import ManageNotification from "./layouts/admin/pages/manage-notification";
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
           <Route path="country" element={<ManageCountry />} />
           <Route path="city" element={<ManageCity />} />
           <Route path="destinations" element={<ManageDestination />} />
+          <Route path="notification" element={<ManageNotification />} />
           <Route path="test" element={<Counter />} />
         </Route>
       </Routes>
