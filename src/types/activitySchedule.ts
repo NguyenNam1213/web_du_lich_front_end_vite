@@ -1,9 +1,12 @@
 export interface ActivitySchedule {
   id?: number;
   activityId: number;
-  date: string; // "2025-10-24"
+  date: string; 
   timeSlot?: string;
   availableSpots: number;
   bookedSpots?: number;
   price?: number;
+
+  startTime?: string;
+  endTime?: string;
 }
