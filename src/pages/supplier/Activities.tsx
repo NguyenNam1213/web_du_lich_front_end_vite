@@ -153,24 +153,24 @@ function Activities() {
             <div className="space-y-3">
               {/* ID đích và danh mục */}
               <div className="flex gap-3">
-                <input
-                  type="number"
-                  placeholder="Destination ID"
-                  className="w-1/2 border rounded px-3 py-2"
-                  value={formData.destinationId || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, destinationId: +e.target.value })
-                  }
-                />
-                <input
-                  type="number"
-                  placeholder="Category ID"
-                  className="w-1/2 border rounded px-3 py-2"
-                  value={formData.categoryId || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, categoryId: +e.target.value })
-                  }
-                />
+                  <input
+                    type="number"
+                    placeholder="Destination ID"
+                    className="w-1/2 border rounded px-3 py-2"
+                    value={formData.destinationId || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, destinationId: +e.target.value })
+                    }
+                  />
+                  <input
+                    type="number"
+                    placeholder="Category ID"
+                    className="w-1/2 border rounded px-3 py-2"
+                    value={formData.categoryId || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, categoryId: +e.target.value })
+                    }
+                  />
               </div>
 
               {/* Tên + slug */}

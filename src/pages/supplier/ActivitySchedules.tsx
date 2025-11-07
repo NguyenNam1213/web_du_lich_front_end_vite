@@ -205,7 +205,7 @@ function ActivitySchedules() {
               <tr>
                 <th className="py-3 px-4 text-left">ID</th>
                 <th className="py-3 px-4 text-left">Ngày</th>
-                <th className="py-3 px-4 text-left">Khung giờ</th>
+                <th className="py-3 px-4 text-left">Thời gian</th>
                 <th className="py-3 px-4 text-left">Chỗ trống</th>
                 <th className="py-3 px-4 text-left">Đã đặt</th>
                 <th className="py-3 px-4 text-left">Giá</th>
@@ -287,11 +287,11 @@ function ActivitySchedules() {
 
               <div>
                 <label className="block text-sm text-gray-700 mb-1">
-                  Khung giờ
+                  Thời gian
                 </label>
                 <input
                   type="text"
-                  placeholder="Ví dụ: 08:00 - 10:00"
+                  placeholder="Ví dụ: 08:00"
                   value={formData.timeSlot || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, timeSlot: e.target.value })
