@@ -6,6 +6,9 @@ import Profile from "./pages/Profile/Profile";
 import AdminLayout from "./layouts/admin/admin-layout";
 import ManageUser from "./layouts/admin/pages/manage-user";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import AllRouter from "./components/AllRouter/AllRouter";
+
 import ManageCountry from "./layouts/admin/pages/manage-country";
 import ManageCity from "./layouts/admin/pages/manage-city";
 import ManageDestination from "./layouts/admin/pages/manage-destination";
@@ -13,6 +16,7 @@ import ManageSupplier from "./layouts/admin/pages/manage-supplier";
 import DashboardPage from "./layouts/admin/pages/dashboard";
 import { Counter } from "./layouts/admin/pages/counter-test";
 import ManageNotification from "./layouts/admin/pages/manage-notification";
+
 
 const App = () => {
   return (
@@ -33,6 +37,8 @@ const App = () => {
           <Route path="notification" element={<ManageNotification />} />
           <Route path="test" element={<Counter />} />
         </Route>
+
+        <Route path="/*" element={<AllRouter />} />
       </Routes>
     </Router>
   );
