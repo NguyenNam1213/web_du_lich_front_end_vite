@@ -24,4 +24,12 @@ export const ActivityService = {
   delete(id: number): Promise<AxiosResponse<{ message: string }>> {
     return instance.delete(`${BASE_URL}/${id}`);
   },
+
+  getAllTour(): Promise<AxiosResponse<Activity[]>> {
+    return instance.get(`/tours/activity`);
+  },
+
+  getTourById(id: number): Promise<AxiosResponse<Activity>> {
+    return instance.get(`/tours/activity/${id}`);
+  }
 };

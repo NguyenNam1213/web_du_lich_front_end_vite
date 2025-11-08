@@ -1,5 +1,11 @@
 export interface Supplier {
-  id: number;
-  name: string;
-  // thêm các trường khác nếu có
+  id: string;
+  companyName: string;
+  businessEmail: string;
+  phone: string;
+  address: string;
+  commissionRate: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
 }

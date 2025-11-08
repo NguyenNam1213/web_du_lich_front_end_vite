@@ -380,7 +380,7 @@ function ActivitySchedules() {
 
       {/* 🔹 Xác nhận xóa */}
       {showDelete && selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-20">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-20">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[360px]">
             <p className="text-gray-800 mb-4">
               Bạn có chắc muốn xóa lịch #{selected.id} ({selected.date})?

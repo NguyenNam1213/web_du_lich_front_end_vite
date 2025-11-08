@@ -5,6 +5,7 @@ import Login from "./components/LoginSignUp/Login";
 import Profile from "./pages/Profile/Profile";
 import AdminLayout from "./layouts/admin/admin-layout";
 import ManageUser from "./layouts/admin/pages/manage-user";
+import ActivityDetail from "./pages/Activity/ActivityDetai";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import AllRouter from "./components/AllRouter/AllRouter";
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/tours/:id" element={<ActivityDetail />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
