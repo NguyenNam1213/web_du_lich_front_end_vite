@@ -5,8 +5,8 @@ import { Review } from "./review";
 import { Supplier } from "./supplier";
 import { User } from "./user";
 
-export type BookingStatus = "pending" | "confirmed" | "cancelled";
-export type PaymentStatus = "pending" | "paid" | "failed";
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
+export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
 export interface Booking {
   id: number;
@@ -23,9 +23,9 @@ export interface Booking {
   bookingDate: string;
   participants: number;
 
-  subtotal: number;
-  discount: number;
-  total: number;
+  subtotal: string | number;
+  discount: string | number;
+  total: string | number;
   currency: string;
 
   status: BookingStatus;

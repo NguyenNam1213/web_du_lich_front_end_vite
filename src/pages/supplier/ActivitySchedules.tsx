@@ -21,7 +21,6 @@ function ActivitySchedules() {
   const [selected, setSelected] = useState<ActivitySchedule | null>(null);
   const [activityId, setActivityId] = useState<number | "">("");
 
-  // Dữ liệu form
   const [formData, setFormData] = useState<Partial<ActivitySchedule>>({
     date: "",
     timeSlot: "",
@@ -30,11 +29,19 @@ function ActivitySchedules() {
     price: 0,
   });
 
-  // Dropdown chọn activity
   const [openDropdown, setOpenDropdown] = useState(false);
   const [search, setSearch] = useState("");
 
-  // 🔹 Lấy danh sách activities
+  // 🔹 Hàm định dạng ngày từ ISO -> dd/mm/yyyy
+  const formatDate = (isoString?: string) => {
+    if (!isoString) return "-";
+    const d = new Date(isoString);
+    const day = String(d.getDate()).padStart(2, "0"); 
+    const month = String(d.getMonth() + 1).padStart(2, "0"); 
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const fetchActivities = async () => {
     try {
       const res = await ActivityService.getAll();
@@ -44,7 +51,6 @@ function ActivitySchedules() {
     }
   };
 
-  // 🔹 Lấy danh sách schedule
   const fetchSchedules = async () => {
     if (!activityId) return;
     try {
@@ -67,7 +73,12 @@ function ActivitySchedules() {
     fetchSchedules();
   }, [activityId]);
 
-  // 🔹 Lưu form (create hoặc update)
+  useEffect(() => {
+    if (activities.length > 0 && !activityId) {
+      setActivityId(activities[0].id); 
+    }
+  }, [activities]);
+
   const handleSave = async () => {
     if (!activityId) return alert("Vui lòng chọn activity");
     if (!formData.date || !formData.availableSpots)
@@ -100,7 +111,6 @@ function ActivitySchedules() {
     }
   };
 
-  // 🔹 Xóa lịch
   const handleDelete = async (id: number) => {
     try {
       await ActivityScheduleService.delete(Number(activityId), id);
@@ -112,7 +122,6 @@ function ActivitySchedules() {
     }
   };
 
-  // Lọc activity theo search
   const filteredActivities = activities.filter(
     (a) =>
       a.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -204,8 +213,9 @@ function ActivitySchedules() {
             <thead className="bg-gray-100 text-gray-700 text-sm">
               <tr>
                 <th className="py-3 px-4 text-left">ID</th>
-                <th className="py-3 px-4 text-left">Ngày</th>
-                <th className="py-3 px-4 text-left">Khung giờ</th>
+                <th className="py-3 px-4 text-left">Thời gian</th>
+                <th className="py-3 px-4 text-left">Ngày bắt đầu</th>
+                <th className="py-3 px-4 text-left">Ngày kết thúc</th>
                 <th className="py-3 px-4 text-left">Chỗ trống</th>
                 <th className="py-3 px-4 text-left">Đã đặt</th>
                 <th className="py-3 px-4 text-left">Giá</th>
@@ -216,8 +226,9 @@ function ActivitySchedules() {
               {schedules.map((sch) => (
                 <tr key={sch.id} className="border-t hover:bg-gray-50">
                   <td className="py-3 px-4 font-medium">{sch.id}</td>
-                  <td className="py-3 px-4">{sch.date}</td>
                   <td className="py-3 px-4">{sch.timeSlot || "-"}</td>
+                  <td className="py-3 px-4">{formatDate(sch.startTime)}</td>
+                  <td className="py-3 px-4">{formatDate(sch.endTime)}</td>             
                   <td className="py-3 px-4">{sch.availableSpots}</td>
                   <td className="py-3 px-4">{sch.bookedSpots || 0}</td>
                   <td className="py-3 px-4">
@@ -259,7 +270,7 @@ function ActivitySchedules() {
 
       {/* 🔹 Form thêm/sửa */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-20">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-20">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[420px] relative">
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
@@ -287,11 +298,11 @@ function ActivitySchedules() {
 
               <div>
                 <label className="block text-sm text-gray-700 mb-1">
-                  Khung giờ
+                  Thời gian
                 </label>
                 <input
                   type="text"
-                  placeholder="Ví dụ: 08:00 - 10:00"
+                  placeholder="Ví dụ: 08:00"
                   value={formData.timeSlot || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, timeSlot: e.target.value })
@@ -369,7 +380,7 @@ function ActivitySchedules() {
 
       {/* 🔹 Xác nhận xóa */}
       {showDelete && selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-20">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-20">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[360px]">
             <p className="text-gray-800 mb-4">
               Bạn có chắc muốn xóa lịch #{selected.id} ({selected.date})?

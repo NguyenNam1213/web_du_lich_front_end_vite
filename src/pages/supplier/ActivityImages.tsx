@@ -24,11 +24,9 @@ function ActivityImages() {
   });
   const [activityId, setActivityId] = useState<number | "">("");
 
-  // Dropdown
   const [openDropdown, setOpenDropdown] = useState(false);
   const [search, setSearch] = useState("");
 
-  // 🔹 Lấy danh sách activity và ảnh
   const fetchImages = async () => {
     if (!activityId) return;
     try {
@@ -60,7 +58,12 @@ function ActivityImages() {
     fetchImages();
   }, [activityId]);
 
-  // 🔹 Lưu form
+  useEffect(() => {
+    if (activities.length > 0 && !activityId) {
+      setActivityId(activities[0].id);
+    }
+  }, [activities]);
+
   const handleSave = async () => {
     if (!activityId) return alert("Vui lòng chọn Activity ID");
     if (!formData.imageUrl) return alert("Vui lòng nhập URL hình ảnh");
@@ -96,7 +99,6 @@ function ActivityImages() {
     }
   };
 
-  // 🔹 Lọc activity theo input
   const filteredActivities = activities.filter(
     (a) =>
       a.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -244,7 +246,7 @@ function ActivityImages() {
 
       {/* 🔹 Dialog thêm / sửa hình ảnh */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-20">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-20">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] relative">
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
@@ -305,7 +307,7 @@ function ActivityImages() {
 
       {/* 🔹 Dialog xác nhận xóa */}
       {showDelete && selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-20">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-20">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[360px]">
             <p className="text-gray-800 mb-4">
               Bạn có chắc chắn muốn xóa hình ảnh #{selected.id}?

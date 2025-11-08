@@ -1,28 +1,32 @@
+import { AxiosResponse } from "axios";
 import { Booking } from "../types/booking";
 import instance from "./api";
 
+export interface UpdateBookingStatusDto {
+  status?: string;
+  paymentStatus?: string;
+}
+
+const BASE_URL = "/supplier/bookings";
+
 export const BookingService = {
-  async getAll(): Promise<Booking[]> {
-    const res = await instance.get("/bookings");
-    return res.data;
+  // 🔹 Lấy danh sách booking của supplier
+  getAll(): Promise<AxiosResponse<Booking[]>> {
+    return instance.get(BASE_URL);
   },
 
-  async getById(id: number): Promise<Booking> {
-    const res = await instance.get(`/bookings/${id}`);
-    return res.data;
+  // 🔹 Lấy chi tiết 1 booking
+  getById(id: number): Promise<AxiosResponse<Booking>> {
+    return instance.get(`${BASE_URL}/${id}`);
   },
 
-  async create(data: Partial<Booking>): Promise<Booking> {
-    const res = await instance.post("/bookings", data);
-    return res.data;
+  // 🔹 Cập nhật trạng thái booking
+  updateStatus(id: number, data: UpdateBookingStatusDto): Promise<AxiosResponse<Booking>> {
+    return instance.patch(`${BASE_URL}/${id}/status`, data);
   },
 
-  async update(id: number, data: Partial<Booking>): Promise<Booking> {
-    const res = await instance.put(`/bookings/${id}`, data);
-    return res.data;
-  },
-
-  async cancel(id: number): Promise<void> {
-    await instance.patch(`/bookings/${id}/cancel`);
+  // 🔹 Xóa booking
+  delete(id: number): Promise<AxiosResponse<{ message: string }>> {
+    return instance.delete(`${BASE_URL}/${id}`);
   },
 };
