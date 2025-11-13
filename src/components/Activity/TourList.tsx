@@ -10,7 +10,7 @@ const TourList: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
 
-  const toursPerSlide = 4; // 🔹 Số tour hiển thị trên 1 slide
+  const toursPerSlide = 3; // 🔹 Số tour hiển thị trên 1 slide
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -52,7 +52,7 @@ const TourList: React.FC = () => {
     );
   }
 
-  // 🔹 Cắt mảng tour theo slide hiện tại (chỉ 4 tour)
+  // 🔹 Cắt mảng tour theo slide hiện tại (chỉ 3 tour)
   const startIndex = currentSlide * toursPerSlide;
   const visibleTours = tours.slice(startIndex, startIndex + toursPerSlide);
 
@@ -77,7 +77,7 @@ const TourList: React.FC = () => {
       </button>
 
       {/* 🔹 Hiển thị 4 tour hiện tại */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500">
         {visibleTours.map((tour) => {
           const imageUrl =
             tour.images && tour.images.length > 0

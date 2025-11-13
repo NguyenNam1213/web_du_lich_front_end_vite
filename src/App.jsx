@@ -5,7 +5,6 @@ import Login from "./components/LoginSignUp/Login";
 import Profile from "./pages/Profile/Profile";
 import AdminLayout from "./layouts/admin/admin-layout";
 import ManageUser from "./layouts/admin/pages/manage-user";
-import ActivityDetail from "./pages/Activity/ActivityDetai";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import AllRouter from "./components/AllRouter/AllRouter";
@@ -17,6 +16,7 @@ import ManageSupplier from "./layouts/admin/pages/manage-supplier";
 import DashboardPage from "./layouts/admin/pages/dashboard";
 import { Counter } from "./layouts/admin/pages/counter-test";
 import ManageNotification from "./layouts/admin/pages/manage-notification";
+import TourDetailPage from "./pages/TourDetail/TourDetailPage";
 
 
 const App = () => {
@@ -27,7 +27,7 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/tours/:id" element={<ActivityDetail />} />
+        <Route path="/tours/:id" element={<TourDetailPage />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="dashboard" element={<DashboardPage />} />

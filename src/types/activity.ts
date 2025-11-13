@@ -15,25 +15,24 @@ export interface Activity {
   name: string;
   slug: string;
   description: string;
-  highlights: string[];
+  highlights?: string[]; // ← có thể null
   duration: number;
   price: number;
   currency: string;
   maxParticipants: number;
-  rating: string;
-  reviewCount: number;
+  rating?: string;
+  reviewCount?: number;
   instantConfirmation: boolean;
   freeCancellation: boolean;
   status: string;
   featured: boolean;
 
-  supplier: Supplier;
-  category: Category;
-  destination: Destination;
-  images: ActivityImage[];
-  schedules: ActivitySchedule[];
-  bookings: Booking[];
-  reviews: Review[];
-  wishlists: Wishlist[];
+  supplier?: Supplier;
+  category?: Category;
+  destination?: Destination;
+  images?: ActivityImage[];
+  schedules?: ActivitySchedule[];
+  bookings?: Booking[];
+  reviews?: Review[];
+  wishlists?: Wishlist[];
 }
-

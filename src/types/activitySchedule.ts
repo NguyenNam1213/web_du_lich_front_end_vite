@@ -1,3 +1,5 @@
+import { Activity } from "./activity";
+
 export interface ActivitySchedule {
   id?: number;
   activityId: number;
@@ -9,4 +11,6 @@ export interface ActivitySchedule {
 
   startTime?: string;
   endTime?: string;
+
+  activity?: Activity;
 }
