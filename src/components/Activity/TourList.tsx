@@ -10,7 +10,7 @@ const TourList: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
 
-  const toursPerSlide = 3; // 🔹 Số tour hiển thị trên 1 slide
+  const toursPerSlide = 3; 
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -52,7 +52,6 @@ const TourList: React.FC = () => {
     );
   }
 
-  // 🔹 Cắt mảng tour theo slide hiện tại (chỉ 3 tour)
   const startIndex = currentSlide * toursPerSlide;
   const visibleTours = tours.slice(startIndex, startIndex + toursPerSlide);
 
@@ -62,7 +61,6 @@ const TourList: React.FC = () => {
         Tour du lịch đặc sắc
       </h2>
 
-      {/* 🔹 Nút chuyển slide */}
       <button
         onClick={handlePrev}
         className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white border shadow-md p-2 rounded-full hover:bg-gray-100"
@@ -76,7 +74,6 @@ const TourList: React.FC = () => {
         <ChevronRight size={20} />
       </button>
 
-      {/* 🔹 Hiển thị 4 tour hiện tại */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500">
         {visibleTours.map((tour) => {
           const imageUrl =
@@ -88,10 +85,9 @@ const TourList: React.FC = () => {
           return (
             <div
               key={tour.id}
-              onClick={() => navigate(`/tours/${tour.id}`)} // 🔹 Chuyển đến TourDetail
+              onClick={() => navigate(`/tours/${tour.id}`)} 
               className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden cursor-pointer group"
             >
-              {/* Ảnh */}
               <div className="relative">
                 <img
                   src={imageUrl}
@@ -105,7 +101,6 @@ const TourList: React.FC = () => {
                 )}
               </div>
 
-              {/* Nội dung */}
               <div className="p-4 flex flex-col justify-between h-[180px]">
                 <div>
                   <h3 className="font-semibold text-lg line-clamp-2 text-gray-800">
@@ -130,7 +125,6 @@ const TourList: React.FC = () => {
         })}
       </div>
 
-      {/* 🔹 Dấu chỉ báo slide */}
       <div className="flex justify-center mt-4 space-x-2">
         {Array.from({ length: totalSlides }).map((_, index) => (
           <button
