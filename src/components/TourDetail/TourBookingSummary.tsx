@@ -2,6 +2,7 @@ import React, { use, useState } from "react";
 import { Calendar, Users, Check } from "lucide-react";
 import { Activity } from "../../types/activity";
 import { useNavigate } from "react-router-dom";
+import { BookingService } from "../../api/booking.service";
 
 interface TourBookingSummaryProps {
   tour?: Activity;
@@ -10,6 +11,7 @@ interface TourBookingSummaryProps {
 export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) => {
   const [date, setDate] = useState<string>("");
   const [participants, setParticipants] = useState<number>(1);
+  const [error, setError] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -19,6 +21,54 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
         Đang tải thông tin đặt tour...
       </div>
     );
+  
+  const handleBooking = async () => {
+    if(!date) {
+      setError("Vui lòng chọn ngày tham quan.");
+      return;
+    }
+    if(participants < 1) {
+      setError("Số lượng người tham gia phải lớn hơn hoặc bằng 1.");
+      return;
+    }
+    setError("");
+
+    try {
+      const payLoad = {
+        activityId: Number(tour.id),
+        supplierId: Number(tour.supplier?.id),
+        scheduleId: Number(tour.schedules?.[0]?.id || 1), // Tùy vào design, tạm lấy lịch đầu tiên
+
+        customerName: "User Name", // bạn có thể lấy từ Profile API
+        customerEmail: "user@gmail.com",
+        customerPhone: "0123456789",
+
+        bookingDate: date,
+        participants: participants,
+
+        subtotal: tour.price * participants,
+        discount: 0,
+        total: tour.price * participants,
+        currency: tour.currency,
+      };
+
+      console.log("📦 Payload trước khi gọi API:", payLoad);
+    
+      const res = await BookingService.createBooking(payLoad);
+      console.log("📌 DATA SEND TO PRISMA:", res.data);
+
+      navigate(`/checkout/${res.data.id}`, {
+        state: {
+          tour,
+          date,
+          participants,
+      }});
+
+    } catch(err){
+      console.log("❌ Booking error:", err.response?.data);
+      setError("Có lỗi xảy ra khi đặt tour. Vui lòng thử lại!");
+    }
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 sticky top-24">
@@ -65,6 +115,13 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
         </div>
       </div>
 
+      {/* ERROR MESSAGE */}
+      {error && (
+        <div className="text-red-500 text-sm mb-3">
+          {error}
+        </div>
+      )}
+
       {/* Tổng cộng */}
       <div className="border-t border-gray-200 my-4 pt-4 flex justify-between text-gray-700">
         <span>Tổng cộng:</span>
@@ -75,13 +132,7 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
 
       {/* Nút đặt */}
       <button className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
-        onClick={() => navigate(`/checkout`, {
-          state: {
-            tour,
-            date,
-            participants
-          }
-        })}
+        onClick={handleBooking}
       >
         Đặt ngay
       </button>

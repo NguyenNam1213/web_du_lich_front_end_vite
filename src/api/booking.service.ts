@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import { Booking } from "../types/booking";
 import instance from "./api";
+import api from "./auth";
 
 export interface UpdateBookingStatusDto {
   status?: string;
@@ -29,4 +30,9 @@ export const BookingService = {
   delete(id: number): Promise<AxiosResponse<{ message: string }>> {
     return instance.delete(`${BASE_URL}/${id}`);
   },
+
+  // 🔹 Tạo booking mới(user)
+  createBooking: async(payload: Booking) =>  {
+    return api.post(BASE_URL, payload);
+  }
 };
