@@ -1,0 +1,39 @@
+import React from "react";
+import CheckoutMain from "./CheckoutMain";
+import CheckoutSummary from "./CheckoutSummary";
+import { useLocation } from "react-router-dom";
+
+const CheckoutPage: React.FC = () => {
+  const location = useLocation();
+  const { tour, date, participants } = location.state || {};
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header (nếu cần) */}
+      <div className="w-full bg-white shadow-sm py-4 mb-6">
+        <div className="max-w-6xl mx-auto px-4">
+          <h1 className="text-xl font-semibold text-gray-800">Thanh toán đặt tour</h1>
+        </div>
+      </div>
+
+      {/* Layout 2 cột */}
+      <div className="max-w-6xl mx-auto px-4 flex gap-6">
+        {/* Cột trái: Form */}
+        <div className="w-2/3">
+          <CheckoutMain />
+        </div>
+
+        {/* Cột phải: Summary */}
+        <div className="w-1/3">
+          <CheckoutSummary
+            tour={tour}
+            date={date}
+            participants={participants}
+           />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CheckoutPage;

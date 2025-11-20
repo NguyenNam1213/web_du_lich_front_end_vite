@@ -17,7 +17,7 @@ import DashboardPage from "./layouts/admin/pages/dashboard";
 import { Counter } from "./layouts/admin/pages/counter-test";
 import ManageNotification from "./layouts/admin/pages/manage-notification";
 import TourDetailPage from "./pages/TourDetail/TourDetailPage";
-
+import CheckoutPage from "./pages/Checkout/CheckoutPage";
 
 const App = () => {
   return (
@@ -28,6 +28,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/tours/:id" element={<TourDetailPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="dashboard" element={<DashboardPage />} />

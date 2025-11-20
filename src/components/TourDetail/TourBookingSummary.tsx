@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { Calendar, Users, Check } from "lucide-react";
 import { Activity } from "../../types/activity";
+import { useNavigate } from "react-router-dom";
 
 interface TourBookingSummaryProps {
   tour?: Activity;
@@ -9,6 +10,8 @@ interface TourBookingSummaryProps {
 export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) => {
   const [date, setDate] = useState<string>("");
   const [participants, setParticipants] = useState<number>(1);
+
+  const navigate = useNavigate();
 
   if (!tour)
     return (
@@ -71,7 +74,15 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
       </div>
 
       {/* Nút đặt */}
-      <button className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
+      <button className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+        onClick={() => navigate(`/checkout`, {
+          state: {
+            tour,
+            date,
+            participants
+          }
+        })}
+      >
         Đặt ngay
       </button>
 
