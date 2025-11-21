@@ -1,11 +1,13 @@
 import React from 'react'
 import './Navbar.css'
 import {Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 const Navbar = () => {
+  const navigate = useNavigate();
   return (
     <div>
       <nav className="NavbarItems">
-        <h1 className="navbar-logo">Travel</h1>
+        <h1 className="navbar-logo" onClick={() => navigate(`/`)}>Travel</h1>
         <div className='nav-search'>
             <input type='text' placeholder='Tìm theo điểm đến, hoạt động' className='search-input'></input>
         </div>

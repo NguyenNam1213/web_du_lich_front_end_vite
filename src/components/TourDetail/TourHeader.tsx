@@ -6,6 +6,14 @@ interface TourHeaderProps {
 }
 
 const TourHeader: React.FC<TourHeaderProps> = ({ tour }) => {
+  const reviewCount = tour.reviews?.length || 0;
+  const averageRating =
+    reviewCount > 0
+      ? (
+          tour.reviews!.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+        ).toFixed(1)
+      : "0.0";
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm">
       {/* 🔹 Tiêu đề */}
@@ -15,7 +23,7 @@ const TourHeader: React.FC<TourHeaderProps> = ({ tour }) => {
       <div className="flex flex-wrap items-center text-gray-600 text-sm mb-3">
         <div className="flex items-center mr-4">
           <Star className="w-4 h-4 text-yellow-400 mr-1" />
-          <span className="font-medium">{tour.rating || "Chưa có đánh giá"}</span>
+          <span className="font-medium">{averageRating || "Chưa có đánh giá"}</span>
           {tour.reviewCount && (
             <span className="ml-1">({tour.reviewCount} đánh giá)</span>
           )}

@@ -41,3 +41,18 @@ export interface Booking {
   payments?: Payment[];
   reviews?: Review[];
 }
+
+export interface BookingCreateDto {
+  activityId: number;
+  supplierId: number;
+  scheduleId: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  bookingDate: string;
+  participants: number;
+  subtotal: number;
+  discount: number;
+  total: number;
+  currency: string;
+}

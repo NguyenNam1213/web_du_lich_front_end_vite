@@ -52,10 +52,7 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
         currency: tour.currency,
       };
 
-      console.log("📦 Payload trước khi gọi API:", payLoad);
-    
       const res = await BookingService.createBooking(payLoad);
-      console.log("📌 DATA SEND TO PRISMA:", res.data);
 
       navigate(`/checkout/${res.data.id}`, {
         state: {
@@ -65,7 +62,6 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
       }});
 
     } catch(err){
-      console.log("❌ Booking error:", err.response?.data);
       setError("Có lỗi xảy ra khi đặt tour. Vui lòng thử lại!");
     }
   }

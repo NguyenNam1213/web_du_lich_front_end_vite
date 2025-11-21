@@ -1,10 +1,32 @@
 export interface Review {
-  id: string;
-  bookingId: string;
-  userId: string;
-  activityId: string;
+  id: number;
+  bookingId: number;
+  activityId: number;
+  userId: number;
   rating: number;
-  comment: string;
-  images: string[] | null;
+  comment?: string;
+  images?: any[];
   createdAt: string;
+
+  user?: {
+    id: number;
+    lastName?: string;
+    avatar?: string | null;
+  };
+}
+
+export interface CreateReviewDto {
+  bookingId: number;
+  activityId: number;
+  rating: number;
+  comment?: string;
+  images?: any[];
+}
+
+export interface UpdateReviewDto {
+  bookingId?: number;
+  activityId?: number;
+  rating?: number;
+  comment?: string;
+  images?: any[];
 }

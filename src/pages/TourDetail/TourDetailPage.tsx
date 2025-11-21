@@ -6,9 +6,9 @@ import TourHeader from "../../components/TourDetail/TourHeader";
 import TourBookingSummary from "../../components/TourDetail/TourBookingSummary";
 import TourGallery from "../../components/TourDetail/TourGallery";
 import TourOverview from "../../components/TourDetail/TourOverview";
-import TourReviews from "../../components/TourDetail/TourReviews";
 import TourSchedules from "../../components/TourDetail/TourSchedules";
 import TourSupplierInfo from "../../components/TourDetail/TourSupplierInfo";
+import { TourReviews } from "../../components/TourDetail/TourReviews";
 
 const TourDetailPage = () => {
   const { id } = useParams();
@@ -48,7 +48,7 @@ const TourDetailPage = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-t border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-5 py-3 text-sm text-gray-500">
           <span className="hover:text-blue-600 cursor-pointer">Trang chủ</span> /{" "}
           <span className="hover:text-blue-600 cursor-pointer">Tour</span> /{" "}
@@ -72,7 +72,7 @@ const TourDetailPage = () => {
           <div className="flex-1 space-y-10">
             <TourOverview tour={tour} />
             <TourSchedules schedules={tour?.schedules} />
-            {/* <TourReviews reviews={tour.reviews} /> */}
+            <TourReviews reviews={tour?.reviews} />
             <TourSupplierInfo supplier={tour?.supplier} />
           </div>
 

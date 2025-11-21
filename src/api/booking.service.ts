@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { Booking } from "../types/booking";
+import { Booking, BookingCreateDto } from "../types/booking";
 import instance from "./api";
 import api from "./auth";
 
@@ -32,7 +32,7 @@ export const BookingService = {
   },
 
   // 🔹 Tạo booking mới(user)
-  createBooking: async(payload: Booking) =>  {
+  createBooking: async(payload: BookingCreateDto) =>  {
     return api.post(BASE_URL, payload);
   }
 };

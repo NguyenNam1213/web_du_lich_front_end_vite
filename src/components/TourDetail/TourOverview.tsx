@@ -14,6 +14,20 @@ export const TourOverview: React.FC<TourOverviewProps> = ({ tour }) => {
       </div>
     );
 
+  const reviewCount = tour.reviews?.length || 0;
+  const averageRating =
+    reviewCount > 0
+      ? (
+          tour.reviews!.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+        ).toFixed(1)
+      : "0.0";
+
+  const displayTour = {
+    ...tour,
+    rating: averageRating,
+    reviewCount: reviewCount,
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
       {/* Tên tour */}
@@ -23,8 +37,8 @@ export const TourOverview: React.FC<TourOverviewProps> = ({ tour }) => {
       <div className="flex flex-wrap items-center gap-4 text-gray-600">
         <div className="flex items-center gap-1">
           <Star className="text-yellow-500 w-5 h-5" />
-          <span className="font-medium text-gray-800">{tour.rating}</span>
-          <span>({tour.reviewCount} đánh giá)</span>
+          <span className="font-medium text-gray-800">{displayTour.rating}</span>
+          <span>({displayTour.reviewCount} đánh giá)</span>
         </div>
 
         <div className="flex items-center gap-1">
