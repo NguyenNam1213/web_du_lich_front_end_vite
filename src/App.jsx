@@ -3,6 +3,59 @@ import Home from "./pages/Home";
 import SignUp from "./components/LoginSignUp/SignUp";
 import Login from "./components/LoginSignUp/Login";
 import Profile from "./pages/Profile/Profile";
+import LoginSuccess from "./components/LoginSignUp/LoginSuccess"
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import AccountSettings from "./pages/Profile/AccountSettings";
+import GiftCard from "./pages/Profile/GiftCard";
+import { UserProvider, useUser } from "./context/UserContext";
+
+const ProtectedRoute = ({ children }) => {
+  const { userData, loading } = useUser();
+
+  if (loading) return <div>Loading...</div>;
+  if (!userData) return <Navigate to="/" replace />;
+
+  return children;
+};
+
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/signup" element={<SignUp />} />
+    <Route path="/login-success" element={<LoginSuccess />} />
+
+    <Route
+      path="/profile"
+      element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/account-settings"
+      element={
+        <ProtectedRoute>
+          <AccountSettings />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/gift-cards"
+      element={
+        <ProtectedRoute>
+          <GiftCard />
+        </ProtectedRoute>
+      }
+    />
+  </Routes>
+);
 import AdminLayout from "./layouts/admin/admin-layout";
 import UserLayout from "./layouts/user/UserLayout";
 import ManageUser from "./layouts/admin/pages/manage-user";
@@ -23,32 +76,11 @@ import TourReviewPage from "./pages/TourReview/TourReviewPage";
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route element={<UserLayout />}>
-          <Route path="/tours/:id" element={<TourDetailPage />} />
-          <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
-        </Route>
-        <Route path="/checkout/:id" element={<CheckoutPage />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="user" element={<ManageUser />} />
-          <Route path="supplier" element={<ManageSupplier />} />
-          <Route path="country" element={<ManageCountry />} />
-          <Route path="city" element={<ManageCity />} />
-          <Route path="destinations" element={<ManageDestination />} />
-          <Route path="notification" element={<ManageNotification />} />
-          <Route path="test" element={<Counter />} />
-        </Route>
-
-        <Route path="/*" element={<AllRouter />} />
-      </Routes>
-    </Router>
+    <UserProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </UserProvider>
   );
 };
 

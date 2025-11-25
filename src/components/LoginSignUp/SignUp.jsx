@@ -28,44 +28,46 @@ const Signup = () => {
   };
 
   return (
-    <div className="container">
-      <div className="header">
-        <div className="text">Đăng kí</div>
-        <div className="underline"></div>
-      </div>
-      <div className="inputs">
-        <div className="input">
-          <img src={user_icon} alt="user" />
-          <input
-            type="text"
-            placeholder="Username"
-            onChange={(e) => setUsername(e.target.value)}
-          />
+    <div className="login-signup-page">
+      <div className="container">
+        <div className="header">
+          <div className="text">Đăng kí</div>
+          <div className="underline"></div>
         </div>
-        <div className="input">
-          <img src={email_icon} alt="email" />
-          <input
-            type="email"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+        <div className="inputs">
+          <div className="input">
+            <img src={user_icon} alt="user" />
+            <input
+              type="text"
+              placeholder="Username"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="input">
+            <img src={email_icon} alt="email" />
+            <input
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="input">
+            <img src={password_icon} alt="password" />
+            <input
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="input">
-          <img src={password_icon} alt="password" />
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-      </div>
 
-      <div className="submit-container">
-        <div className="submit" onClick={handleSignUp}>
-          Đăng kí
-        </div>
-        <div className="submit" onClick={handleToLogin}>
-          Đăng nhập
+        <div className="submit-container">
+          <div className="submit" onClick={handleSignUp}>
+            Đăng kí
+          </div>
+          <div className="submit" onClick={handleToLogin}>
+            Đăng nhập
+          </div>
         </div>
       </div>
     </div>

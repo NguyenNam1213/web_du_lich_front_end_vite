@@ -10,12 +10,13 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     if(token){
         config.headers.Authorization = `Bearer ${token}`
     }
     return config
 });
+
 
 export default api;
 
@@ -30,3 +31,5 @@ export const register = (email, password) => {
 export const getProfile = () => {
   return api.get("/auth/profile");
 };
+
+export default api;

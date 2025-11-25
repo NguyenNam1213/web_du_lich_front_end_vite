@@ -1,0 +1,73 @@
+.profile-container {
+  display: flex;
+  gap: 40px;
+  padding: 40px 80px;
+  background-color: #f9f9fb;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.profile-main {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  padding: 30px 40px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-main h2 {
+  color: #ff5b00;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.desc {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+  align-items: center;
+}
+
+.info-row span {
+  color: #555;
+  font-size: 14px;
+  width: 30%;
+}
+
+.info-row p {
+  width: 65%;
+  color: #333;
+}
+
+.info-row input {
+  width: 65%;
+  padding: 6px 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.button-group {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.edit-btn,
+.save-btn {
+  background-color: #ff5b00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.edit-btn:hover,
+.save-btn:hover {
+  background-color: #e64a00;
+}
