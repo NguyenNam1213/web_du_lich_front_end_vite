@@ -56,6 +56,23 @@ const AppRoutes = () => (
     />
   </Routes>
 );
+import AdminLayout from "./layouts/admin/admin-layout";
+import UserLayout from "./layouts/user/UserLayout";
+import ManageUser from "./layouts/admin/pages/manage-user";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import AllRouter from "./components/AllRouter/AllRouter";
+
+import ManageCountry from "./layouts/admin/pages/manage-country";
+import ManageCity from "./layouts/admin/pages/manage-city";
+import ManageDestination from "./layouts/admin/pages/manage-destination";
+import ManageSupplier from "./layouts/admin/pages/manage-supplier";
+import DashboardPage from "./layouts/admin/pages/dashboard";
+import { Counter } from "./layouts/admin/pages/counter-test";
+import ManageNotification from "./layouts/admin/pages/manage-notification";
+import TourDetailPage from "./pages/TourDetail/TourDetailPage";
+import CheckoutPage from "./pages/Checkout/CheckoutPage";
+import TourReviewPage from "./pages/TourReview/TourReviewPage";
 
 const App = () => {
   return (
