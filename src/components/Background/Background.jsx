@@ -22,7 +22,7 @@ const Background = () => {
         <div className="bg-content">
           <h1>Khám phá phiên bản tuyệt nhất của bạn</h1>
           <p>Mở ra chân trời mới</p>
-          <div class="search-box">
+          <div className="search-box">
             <input type="text" placeholder="Bạn muốn đi đâu?" />
             <button>Khám phá</button>
           </div>

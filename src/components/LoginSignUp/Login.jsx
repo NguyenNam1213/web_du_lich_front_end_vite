@@ -9,16 +9,30 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Vui lòng nhập đầy đủ email và mật khẩu!");
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await login(email, password);
-      localStorage.setItem("token", res.data.access_token);
-      alert("Đăng nhập thành công");
-      navigate("/");
+     
+      if (res.data && res.data.access_token) {
+        localStorage.setItem("access_token", res.data.access_token);
+        alert("Đăng nhập thành công!");
+        navigate("/")
+      } else {
+        alert("Không nhận được token từ máy chủ!");
+      }
     } catch (err) {
-      console.error(err.response?.data || err);
-      alert("Email hoặc mật khẩu không đúng");
+      console.error("Lỗi đăng nhập:", err.response?.data || err.message);
+      alert("Email hoặc mật khẩu không đúng!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,40 +41,63 @@ const Login = () => {
   };
 
   return (
-    <div className="container">
-      <div className="header">
-        <div className="text">Đăng nhập</div>
-        <div className="underline"></div>
-      </div>
-      <div className="inputs">
-        <div className="input">
-          <img src={email_icon} alt="email" />
-          <input
-            type="email"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+    <div className="login-signup-page">
+      <div className="container">
+        <div className="header">
+          <div className="text">Đăng nhập</div>
+          <div className="underline"></div>
         </div>
-        <div className="input">
-          <img src={password_icon} alt="password" />
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-      </div>
 
-      <div className="forgot-password">
-        Quên mật khẩu? <span>Nhấn vào đây</span>
-      </div>
-
-      <div className="submit-container">
-        <div className="submit" onClick={handleToSignUp}>
-          Đăng kí
+        <div className="inputs">
+          <div className="input">
+            <img src={email_icon} alt="email" />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="input">
+            <img src={password_icon} alt="password" />
+            <input
+              type="password"
+              placeholder="Mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="submit" onClick={handleLogin}>
-          Đăng nhập
+
+        <div className="forgot-password">
+          Quên mật khẩu?{" "}
+          <span onClick={() => navigate("/account-settings")}>
+            Nhấn vào đây
+          </span>
+        </div>
+
+        <div className="submit-container">
+          <div className="row-buttons">
+            <div className="submit" onClick={handleToSignUp}>
+              Đăng kí
+            </div>
+            <div className="submit" onClick={handleLogin}>
+              {loading ? "Đang xử lý..." : "Đăng nhập"}
+            </div>
+          </div>
+
+          <div
+            className="google-btn"
+            onClick={() =>
+              (window.location.href = "http://localhost:3000/auth/google")
+            }
+          >
+            <img
+              src="https://img.icons8.com/color/24/google-logo.png"
+              alt="google"
+            />
+            Đăng nhập bằng Google
+          </div>
         </div>
       </div>
     </div>
