@@ -22,4 +22,22 @@ export const ActivityImageService = {
   delete(activityId: number, id: number) {
     return instance.delete(`/activities/${activityId}/images/${id}`);
   },
+
+  // upload image
+  upload(
+    activityId: number, 
+    file: File,
+    onUploadProgress?: (progressEvent: any) => void
+  ) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return instance.post(`/activities/${activityId}/images/upload`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      timeout: 60000, // 60 giây
+      onUploadProgress, // Axios sẽ gọi callback này với progress event
+    });
+  },
 };
