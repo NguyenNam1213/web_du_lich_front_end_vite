@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Activity } from "../../types/activity";
+import { useDispatch } from "react-redux";
+import { setAmount, setCurrency } from "../../store/slices/checkoutSlice";
 
 interface Props {
   tour: Activity;
@@ -7,7 +9,13 @@ interface Props {
 }
 
 const PriceBreakdown: React.FC<Props> = ({ tour, participants }) => {
+  const dispatch = useDispatch();
   const price = tour.price * participants;
+
+  useEffect(() => {
+    dispatch(setAmount(price));
+    dispatch(setCurrency(tour.currency))
+  }, [price, tour.currency]);
 
   return (
     <div>
