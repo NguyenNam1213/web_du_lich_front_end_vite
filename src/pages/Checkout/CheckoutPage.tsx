@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CheckoutMain from "./CheckoutMain";
 import CheckoutSummary from "./CheckoutSummary";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setBookingId } from "../../store/slices/checkoutSlice";
 
 const CheckoutPage: React.FC = () => {
   const location = useLocation();
   const { tour, date, participants } = location.state || {};
+  const {id} = useParams();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (id) dispatch(setBookingId(Number(id)));
+  }, [id]);
 
   return (
     <div className="min-h-screen bg-gray-50">

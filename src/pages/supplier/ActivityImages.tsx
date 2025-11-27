@@ -4,7 +4,9 @@ import {
   AiOutlineDelete,
   AiOutlinePlus,
   AiOutlineClose,
+  AiOutlineCloudUpload,
 } from "react-icons/ai";
+import imageCompression from "browser-image-compression";
 import { ActivityImageService } from "../../api/activityImage.service";
 import { ActivityService } from "../../api/activity.service";
 import { ActivityImage } from "../../types/activityImage";
@@ -26,6 +28,13 @@ function ActivityImages() {
 
   const [openDropdown, setOpenDropdown] = useState(false);
   const [search, setSearch] = useState("");
+
+  // 🆕 States cho upload
+  const [uploading, setUploading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const fetchImages = async () => {
     if (!activityId) return;
@@ -64,9 +73,107 @@ function ActivityImages() {
     }
   }, [activities]);
 
+  // 🆕 Xử lý khi chọn file
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Vui lòng chọn file ảnh");
+      return;
+    }
+
+    // Validate file size (max 10MB trước khi nén)
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Kích thước ảnh không được vượt quá 10MB");
+      return;
+    }
+
+    try {
+      setCompressing(true);
+
+      // Cấu hình nén ảnh
+      const options = {
+        maxSizeMB: 1, // Nén xuống tối đa 1MB
+        maxWidthOrHeight: 1920, // Giữ kích thước tối đa 1920px
+        useWebWorker: true, // Sử dụng Web Worker để không block UI
+        fileType: file.type, // Giữ nguyên định dạng
+      };
+
+      // Nén ảnh
+      const compressedFile = await imageCompression(file, options);
+      
+      console.log(`Kích thước gốc: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      console.log(`Kích thước sau nén: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+
+      setSelectedFile(compressedFile);
+      
+      // Tạo preview URL từ file đã nén
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (error) {
+      console.error("Lỗi nén ảnh:", error);
+      alert("Không thể xử lý ảnh. Vui lòng thử ảnh khác.");
+    } finally {
+      setCompressing(false);
+    }
+  };
+
+  // 🆕 Upload ảnh lên server
+  const handleUpload = async () => {
+    if (!selectedFile || !activityId) return;
+
+    try {
+      setUploading(true);
+      setUploadProgress(0);
+      
+      const res = await ActivityImageService.upload(
+        Number(activityId), 
+        selectedFile,
+        (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 100)
+          );
+          setUploadProgress(percentCompleted);
+        }
+      );
+      
+      const uploadedUrl = res.data.url;
+      setFormData({ imageUrl: uploadedUrl });
+      setPreviewUrl(uploadedUrl);
+      
+      alert("✅ Tải ảnh lên thành công!");
+    } catch (err: any) {
+      console.error(err);
+      
+      // Xử lý các loại lỗi khác nhau
+      if (err.code === 'ECONNABORTED') {
+        alert(
+          "⏱️ Upload quá lâu (>60s). Vui lòng:\n" +
+          "1. Chọn ảnh có kích thước nhỏ hơn\n" +
+          "2. Kiểm tra kết nối mạng\n" +
+          "3. Thử lại sau"
+        );
+      } else if (err.response?.status === 413) {
+        alert("❌ File quá lớn. Vui lòng chọn ảnh nhỏ hơn.");
+      } else if (err.response?.status === 500) {
+        alert("❌ Lỗi server. Vui lòng liên hệ quản trị viên.");
+      } else {
+        alert("❌ Tải ảnh lên thất bại. Vui lòng thử lại.");
+      }
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
   const handleSave = async () => {
     if (!activityId) return alert("Vui lòng chọn Activity ID");
-    if (!formData.imageUrl) return alert("Vui lòng nhập URL hình ảnh");
+    if (!formData.imageUrl) return alert("Vui lòng tải ảnh lên trước khi lưu");
 
     try {
       if (selected) {
@@ -81,6 +188,8 @@ function ActivityImages() {
       setShowForm(false);
       setSelected(null);
       setFormData({ imageUrl: "" });
+      setSelectedFile(null);
+      setPreviewUrl("");
       fetchImages();
     } catch (err) {
       console.error(err);
@@ -97,6 +206,31 @@ function ActivityImages() {
       console.error(err);
       alert("Xóa hình ảnh thất bại");
     }
+  };
+
+  // 🆕 Reset form khi mở/đóng
+  const openFormDialog = (image?: ActivityImage) => {
+    if (image) {
+      // Chế độ edit
+      setSelected(image);
+      setFormData({ imageUrl: image.imageUrl });
+      setPreviewUrl(image.imageUrl);
+    } else {
+      // Chế độ thêm mới
+      setSelected(null);
+      setFormData({ imageUrl: "" });
+      setPreviewUrl("");
+      setSelectedFile(null);
+    }
+    setShowForm(true);
+  };
+
+  const closeFormDialog = () => {
+    setShowForm(false);
+    setSelected(null);
+    setFormData({ imageUrl: "" });
+    setSelectedFile(null);
+    setPreviewUrl("");
   };
 
   const filteredActivities = activities.filter(
@@ -163,9 +297,7 @@ function ActivityImages() {
           <button
             onClick={() => {
               if (!activityId) return alert("Chọn activity trước");
-              setSelected(null);
-              setFormData({ imageUrl: "" });
-              setShowForm(true);
+              openFormDialog();
             }}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
           >
@@ -212,11 +344,7 @@ function ActivityImages() {
                   </td>
                   <td className="py-3 px-4 text-center flex gap-3 justify-center">
                     <button
-                      onClick={() => {
-                        setSelected(img);
-                        setFormData({ imageUrl: img.imageUrl });
-                        setShowForm(true);
-                      }}
+                      onClick={() => openFormDialog(img)}
                       className="text-blue-600 hover:text-blue-800"
                     >
                       <AiOutlineEdit size={18} />
@@ -244,13 +372,13 @@ function ActivityImages() {
         </p>
       )}
 
-      {/* 🔹 Dialog thêm / sửa hình ảnh */}
+      {/* 🔹 Dialog thêm / sửa hình ảnh - CẬP NHẬT */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-20">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] relative">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[480px] relative">
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-              onClick={() => setShowForm(false)}
+              onClick={closeFormDialog}
             >
               <AiOutlineClose size={20} />
             </button>
@@ -259,44 +387,113 @@ function ActivityImages() {
               {selected ? "Chỉnh sửa hình ảnh" : "Thêm hình ảnh"}
             </h3>
 
-            <label className="block mb-2 text-sm text-gray-700">
-              URL hình ảnh
-            </label>
-            <input
-              type="text"
-              value={formData.imageUrl || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, imageUrl: e.target.value })
-              }
-              className="border rounded px-3 py-2 w-full mb-4"
-              placeholder="https://..."
-            />
+            {/* 🆕 Upload section */}
+            {!selected && (
+              <div className="mb-4">
+                <label className="block mb-2 text-sm text-gray-700 font-medium">
+                  Chọn ảnh từ máy
+                </label>
+                <div className="flex gap-2">
+                  <label className={`flex-1 flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-lg transition ${
+                    compressing 
+                      ? "border-yellow-400 bg-yellow-50 cursor-wait" 
+                      : "border-gray-300 cursor-pointer hover:border-blue-500 hover:bg-blue-50"
+                  }`}>
+                    <AiOutlineCloudUpload size={20} className="mr-2" />
+                    <span className="text-sm text-gray-600">
+                      {compressing 
+                        ? "Đang nén ảnh..." 
+                        : selectedFile 
+                          ? selectedFile.name 
+                          : "Chọn file ảnh..."}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      disabled={compressing || uploading}
+                    />
+                  </label>
+                  <button
+                    onClick={handleUpload}
+                    disabled={!selectedFile || uploading || compressing}
+                    className={`px-4 py-2 rounded-lg font-medium ${
+                      !selectedFile || uploading || compressing
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700 text-white"
+                    }`}
+                  >
+                    {uploading ? "Đang tải..." : "Tải lên"}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Hỗ trợ: JPG, PNG, GIF. Tối đa 10MB (sẽ tự động nén xuống 1MB)
+                </p>
+              </div>
+            )}
+
+            {/* URL field - chỉ hiển thị sau khi upload hoặc khi edit */}
+            <div className="mb-4">
+              <label className="block mb-2 text-sm text-gray-700 font-medium">
+                URL hình ảnh
+              </label>
+              <input
+                type="text"
+                value={formData.imageUrl || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, imageUrl: e.target.value })
+                }
+                className="border rounded px-3 py-2 w-full bg-gray-50"
+                placeholder="URL sẽ tự động điền sau khi upload..."
+                readOnly={!selected}
+              />
+            </div>
 
             {/* 🔹 Preview ảnh */}
-            {formData.imageUrl && (
+            {previewUrl && (
               <div className="mb-4 flex justify-center">
-                <img
-                  src={formData.imageUrl}
-                  alt="Preview"
-                  className="w-40 h-40 object-cover rounded-md border"
-                  onError={(e) =>
-                    (e.currentTarget.src =
-                      "https://via.placeholder.com/150?text=No+Preview")
-                  }
-                />
+                <div className="relative">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="w-64 h-64 object-cover rounded-md border-2 border-gray-200"
+                    onError={(e) =>
+                      (e.currentTarget.src =
+                        "https://via.placeholder.com/250?text=Lỗi+tải+ảnh")
+                    }
+                  />
+                  {uploading && (
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-md">
+                      <div className="text-white text-sm mb-2">Đang tải lên...</div>
+                      <div className="w-48 bg-gray-300 rounded-full h-2 overflow-hidden">
+                        <div 
+                          className="bg-green-500 h-full transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                      <div className="text-white text-xs mt-1">{uploadProgress}%</div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setShowForm(false)}
+                onClick={closeFormDialog}
                 className="px-4 py-2 border rounded hover:bg-gray-100"
               >
                 Hủy
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                disabled={!formData.imageUrl}
+                className={`px-4 py-2 rounded ${
+                  !formData.imageUrl
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
               >
                 Lưu
               </button>
