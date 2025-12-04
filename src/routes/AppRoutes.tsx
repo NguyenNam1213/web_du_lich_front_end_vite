@@ -26,6 +26,7 @@ import UserLayout from "../layouts/user/UserLayout";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
 import TourDetailPage from "../pages/TourDetail/TourDetailPage";
 import TourReviewPage from "../pages/TourReview/TourReviewPage";
+import WishList from "../pages/Profile/WishList";
 
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
@@ -66,6 +67,14 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute>
           <GiftCard />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/wishlist"
+      element={
+        <ProtectedRoute>
+          <WishList />
         </ProtectedRoute>
       }
     />

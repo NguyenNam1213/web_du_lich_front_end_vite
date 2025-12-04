@@ -113,6 +113,9 @@ const ProfileSidebar = () => {
       <div className="sidebar-section" onClick={() => navigate("/profile")}>
         <p>Thông tin cá nhân</p>
       </div>
+      <div className="sidebar-section" onClick={() => navigate("/wishlist")}>
+        <p>Wishlist</p>
+      </div>
     </div>
   );
 };
