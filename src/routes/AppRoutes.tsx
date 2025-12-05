@@ -12,6 +12,7 @@ import { useUser } from "../context/UserContext";
 import AccountSettings from "../pages/Profile/AccountSettings";
 import GiftCard from "../pages/Profile/GiftCard";
 import Profile from "../pages/Profile/Profile";
+import SupplierRequest from "../pages/Profile/SupplierRequest";
 import AllRouter from "../components/AllRouter/AllRouter";
 import AdminLayout from "../layouts/admin/admin-layout";
 import { Counter } from "../layouts/admin/pages/counter-test";
@@ -21,7 +22,9 @@ import ManageCountry from "../layouts/admin/pages/manage-country";
 import ManageDestination from "../layouts/admin/pages/manage-destination";
 import ManageNotification from "../layouts/admin/pages/manage-notification";
 import ManageSupplier from "../layouts/admin/pages/manage-supplier";
+import ManageRequestSupplier from "../layouts/admin/pages/manage-request-supplier";
 import ManageUser from "../layouts/admin/pages/manage-user";
+import ManageRatings from "../layouts/admin/pages/manage-ratings";
 import UserLayout from "../layouts/user/UserLayout";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
 import TourDetailPage from "../pages/TourDetail/TourDetailPage";
@@ -69,6 +72,14 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+    <Route
+      path="/supplier-request"
+      element={
+        <ProtectedRoute>
+          <SupplierRequest />
+        </ProtectedRoute>
+      }
+    />
 
     <Route element={<UserLayout />}>
         <Route path="/" element={<Home />} />
@@ -82,10 +93,12 @@ const AppRoutes = () => (
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="user" element={<ManageUser />} />
         <Route path="supplier" element={<ManageSupplier />} />
+        <Route path="request-supplier" element={<ManageRequestSupplier />} />
         <Route path="country" element={<ManageCountry />} />
         <Route path="city" element={<ManageCity />} />
         <Route path="destinations" element={<ManageDestination />} />
         <Route path="notification" element={<ManageNotification />} />
+        <Route path="ratings" element={<ManageRatings />} />
         <Route path="test" element={<Counter />} />
     </Route>
     <Route path="/*" element={<AllRouter />} />

@@ -13,6 +13,7 @@ import { Supplier } from "../../admin/types/supplier.type";
 import { Trash2, Edit2, X } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import { toastService } from "../../../utils/toast";
 
 export default function SupplierManagementTable() {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,6 +24,8 @@ export default function SupplierManagementTable() {
   } = useSelector((state: RootState) => state.suppliers || {});
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingSupplierId, setDeletingSupplierId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Supplier>>({
     companyName: "",
     businessEmail: "",
@@ -98,10 +101,22 @@ export default function SupplierManagementTable() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa supplier này không?")) {
-      await dispatch(deleteSupplierAsync(id));
+  const handleDelete = (id: string) => {
+    setDeletingSupplierId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingSupplierId) return;
+    
+    try {
+      await dispatch(deleteSupplierAsync(deletingSupplierId));
       dispatch(fetchSuppliers());
+      toastService.success("Đã xóa supplier thành công!");
+      setIsDeleteModalOpen(false);
+      setDeletingSupplierId(null);
+    } catch (error) {
+      toastService.error("Xóa supplier thất bại!");
     }
   };
 
@@ -351,6 +366,78 @@ export default function SupplierManagementTable() {
                     className="px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors shadow-sm"
                   >
                     Lưu
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition>
+
+      {/* Modal xác nhận xóa */}
+      <Transition appear show={isDeleteModalOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setIsDeleteModalOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/40" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-200"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-150"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200">
+                <Dialog.Title className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Xóa Supplier
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </Dialog.Title>
+
+                <div className="px-6 py-4 space-y-4">
+                  <p className="text-sm text-gray-700">
+                    Bạn có chắc chắn muốn xóa supplier này không? Hành động này không
+                    thể hoàn tác.
+                  </p>
+                </div>
+
+                <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteConfirm}
+                    className="px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors shadow-sm"
+                  >
+                    Xóa
                   </button>
                 </div>
               </Dialog.Panel>

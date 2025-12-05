@@ -15,6 +15,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Pagination from "../components/pagination";
 import { getUsers } from "../../../services/api/userApi";
+import { toastService } from "../../../utils/toast";
 
 const getRoleColor = (role: string) => {
   switch (role) {
@@ -51,6 +52,8 @@ export default function UserManagementTable() {
   } = useSelector((state: RootState) => state.users || {});
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<User>>({
     email: "",
     firstName: "",
@@ -117,10 +120,22 @@ export default function UserManagementTable() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa người dùng này không?")) {
-      await dispatch(deleteUserAsync(id));
+  const handleDelete = (id: string) => {
+    setDeletingUserId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingUserId) return;
+    
+    try {
+      await dispatch(deleteUserAsync(deletingUserId));
       dispatch(fetchUsers({ page: currentPage }));
+      toastService.success("Đã xóa người dùng thành công!");
+      setIsDeleteModalOpen(false);
+      setDeletingUserId(null);
+    } catch (error) {
+      toastService.error("Xóa người dùng thất bại!");
     }
   };
 
@@ -180,8 +195,9 @@ export default function UserManagementTable() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      toastService.success("Xuất CSV thành công!");
     } catch (e) {
-      alert("Xuất CSV thất bại. Vui lòng thử lại.");
+      toastService.error("Xuất CSV thất bại. Vui lòng thử lại.");
     } finally {
       setExporting(false);
     }
@@ -453,6 +469,78 @@ export default function UserManagementTable() {
                     className="px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors shadow-sm"
                   >
                     Lưu
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition>
+
+      {/* Modal xác nhận xóa */}
+      <Transition appear show={isDeleteModalOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setIsDeleteModalOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/40" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-200"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-150"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200">
+                <Dialog.Title className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Xóa Người Dùng
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </Dialog.Title>
+
+                <div className="px-6 py-4 space-y-4">
+                  <p className="text-sm text-gray-700">
+                    Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không
+                    thể hoàn tác.
+                  </p>
+                </div>
+
+                <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteConfirm}
+                    className="px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors shadow-sm"
+                  >
+                    Xóa
                   </button>
                 </div>
               </Dialog.Panel>

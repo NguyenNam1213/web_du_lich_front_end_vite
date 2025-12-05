@@ -8,6 +8,7 @@ import {
   NotificationItem,
 } from "../../../services/api/notificationApi";
 import Pagination from "./pagination";
+import { toastService } from "../../../utils/toast";
 
 type StatusFilter = "all" | "unread" | "read";
 
@@ -54,7 +55,7 @@ export default function NotificationList() {
       window.dispatchEvent(new Event('notifications:updated'));
     } catch (e) {
       setItems(prev);
-      alert("Đánh dấu đã đọc thất bại");
+      toastService.error("Đánh dấu đã đọc thất bại");
     }
   };
 
@@ -66,7 +67,7 @@ export default function NotificationList() {
       await markAllNotificationsRead();
       window.dispatchEvent(new Event('notifications:updated'));
     } catch (e) {
-      alert("Đánh dấu tất cả đã đọc thất bại");
+      toastService.error("Đánh dấu tất cả đã đọc thất bại");
       fetchData();
     } finally {
       setMarkingAll(false);
