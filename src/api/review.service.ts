@@ -6,6 +6,11 @@ export const getReviewByActivity = async (activityId: number): Promise<Review[]>
     return res.data;
 };
 
+export const getReviewByBooking = async (bookingId: number): Promise<Review[]> => {
+    const res = await api.get(`/reviews/booking/${bookingId}`);
+    return res.data;
+}
+
 export const createReview = async (data: CreateReviewDto): Promise<Review> => {
     const res = await api.post('/reviews', data);
     return res.data;

@@ -31,8 +31,13 @@ export const BookingService = {
     return instance.delete(`${BASE_URL}/${id}`);
   },
 
+  // USER
   // 🔹 Tạo booking mới(user)
   createBooking: async(payload: BookingCreateDto) =>  {
     return api.post(BASE_URL, payload);
+  },
+
+  getMyBooking: async() => {
+    return api.get(`${BASE_URL}/my-booking`);
   }
 };
