@@ -36,7 +36,7 @@ export const ActivityImageService = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      timeout: 60000, // 60 giây
+      timeout: 30000, 
       onUploadProgress, // Axios sẽ gọi callback này với progress event
     });
   },

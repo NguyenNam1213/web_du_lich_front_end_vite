@@ -37,9 +37,9 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
       const payLoad = {
         activityId: Number(tour.id),
         supplierId: Number(tour.supplier?.id),
-        scheduleId: Number(tour.schedules?.[0]?.id || 1), // Tùy vào design, tạm lấy lịch đầu tiên
+        scheduleId: Number(tour.schedules?.[0]?.id || 1), 
 
-        customerName: "User Name", // bạn có thể lấy từ Profile API
+        customerName: "User Name", 
         customerEmail: "user@gmail.com",
         customerPhone: "0123456789",
 

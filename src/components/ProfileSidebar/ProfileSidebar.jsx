@@ -113,8 +113,11 @@ const ProfileSidebar = () => {
       <div className="sidebar-section" onClick={() => navigate("/profile")}>
         <p>Thông tin cá nhân</p>
       </div>
-      <div className="sidebar-section" onClick={() => navigate("/wishlist")}>
+      <div className="sidebar-section" onClick={() => navigate("/profile/wishlist")}>
         <p>Wishlist</p>
+      </div>
+      <div className="sidebar-section" onClick={() => navigate("/profile/booking-history")}>
+        <p>Lịch sử đặt tour</p>
       </div>
     </div>
   );

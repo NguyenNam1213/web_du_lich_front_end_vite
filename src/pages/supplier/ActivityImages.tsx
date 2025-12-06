@@ -73,18 +73,15 @@ function ActivityImages() {
     }
   }, [activities]);
 
-  // 🆕 Xử lý khi chọn file
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       alert("Vui lòng chọn file ảnh");
       return;
     }
 
-    // Validate file size (max 10MB trước khi nén)
     if (file.size > 10 * 1024 * 1024) {
       alert("Kích thước ảnh không được vượt quá 10MB");
       return;
@@ -95,13 +92,12 @@ function ActivityImages() {
 
       // Cấu hình nén ảnh
       const options = {
-        maxSizeMB: 1, // Nén xuống tối đa 1MB
-        maxWidthOrHeight: 1920, // Giữ kích thước tối đa 1920px
-        useWebWorker: true, // Sử dụng Web Worker để không block UI
-        fileType: file.type, // Giữ nguyên định dạng
+        maxSizeMB: 1, 
+        maxWidthOrHeight: 1920, 
+        useWebWorker: true, 
+        fileType: file.type, 
       };
 
-      // Nén ảnh
       const compressedFile = await imageCompression(file, options);
       
       console.log(`Kích thước gốc: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
@@ -208,15 +204,12 @@ function ActivityImages() {
     }
   };
 
-  // 🆕 Reset form khi mở/đóng
   const openFormDialog = (image?: ActivityImage) => {
     if (image) {
-      // Chế độ edit
       setSelected(image);
       setFormData({ imageUrl: image.imageUrl });
       setPreviewUrl(image.imageUrl);
     } else {
-      // Chế độ thêm mới
       setSelected(null);
       setFormData({ imageUrl: "" });
       setPreviewUrl("");

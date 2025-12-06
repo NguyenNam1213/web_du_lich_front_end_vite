@@ -20,7 +20,6 @@ const WishList = () => {
 	const handleRemove = async (activityId: number) => {
 		try {
 			await WishlistService.removeFromWishlist(activityId);
-			// reload list sau khi xoá
 			loadWishlist();
 		} catch (err) {
 			console.error(err);
@@ -37,19 +36,14 @@ const WishList = () => {
 				<ProfileSidebar />
 			</div>
 
-			{/* Wishlist Section */}
 			<div className="flex-1 bg-white rounded-[10px] p-[30px_40px] shadow-[0_0_5px_rgba(0,0,0,0.1)]">
-
 				<h2 className="text-[24px] font-semibold mb-[20px]">My Wishlist</h2>
-
 				{wishlist.length === 0 ? (
 					<p className="text-gray-500">Bạn chưa có wishlist nào.</p>
 				) : (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
-
 						{wishlist.map((item: any) => {
 							const tour = item.activity;
-
 							return (
 								<div
 									key={item.id}
@@ -65,21 +59,17 @@ const WishList = () => {
 									>
 										<AiOutlineDelete size={22} />
 									</button>
-
 									{/* Nội dung */}
 									<div onClick={() => navigate(`/tours/${tour.id}`)}>
 										<h3 className="text-[18px] font-semibold mb-[8px]">
 											{tour.name}
 										</h3>
-
 										<p className="text-gray-600 text-[14px] mb-[6px]">
 											⏱ Thời lượng: {tour.duration} giờ
 										</p>
-
 										<p className="text-gray-600 text-[14px] mb-[6px]">
 											⭐ Đánh giá: {tour.rating}
 										</p>
-
 										<p className="text-[#ff5a5f] font-semibold">
 											{tour.price} {tour.currency}
 										</p>
@@ -87,10 +77,8 @@ const WishList = () => {
 								</div>
 							);
 						})}
-
 					</div>
 				)}
-
 			</div>
 		</div>
 	);

@@ -16,10 +16,8 @@ const TourHeader: React.FC<TourHeaderProps> = ({ tour }) => {
         ).toFixed(1)
       : "0.0";
 
-  // ❤️ trạng thái yêu thích
   const [isLiked, setIsLiked] = useState(false);
 
-  // Kiểm tra xem activity có trong wishlist hay chưa
   useEffect(() => {
     const fetchWishlistStatus = async () => {
       const token = localStorage.getItem("access_token");
@@ -37,7 +35,6 @@ const TourHeader: React.FC<TourHeaderProps> = ({ tour }) => {
     fetchWishlistStatus();
   }, [tour.id]);
 
-  // ❤️ Hàm thêm vào wishlist
   const handleAddWishlist = async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -62,10 +59,7 @@ const TourHeader: React.FC<TourHeaderProps> = ({ tour }) => {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm">
-
-      {/* Chia layout thành 2 bên */}
       <div className="flex justify-between items-start">
-
         {/* LEFT */}
         <div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">{tour.name}</h1>
@@ -94,7 +88,7 @@ const TourHeader: React.FC<TourHeaderProps> = ({ tour }) => {
           )}
         </div>
 
-        {/* RIGHT ❤️ */}
+        {/* RIGHT */}
         <button
           onClick={handleAddWishlist}
           className="flex items-center gap-2 px-4 py-2 rounded-lg border transition
