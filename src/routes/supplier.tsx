@@ -10,34 +10,34 @@ const Booking = lazy(() => import("../pages/supplier/Booking"));
 const LoginSupplier = lazy(() => import("../components/Supplier/LoginSupplier"))
 
 export const routeSupplier: RouteObject[] = [
-    {
-        path: "/supplier",
-        element: <SupplierLayout />,
-        children: [
-            {
-                index: true,
-                element: <Dashboard />,
-            },
-            {
-                path: "activities",
-                element: <Activities />,
-            },
-            {
-                path: "image",
-                element: <ActivityImages />,
-            },
-            {
-                path: "schedules",
-                element: <ActivitySchedules />,
-            },
-            {
-                path: "booking",
-                element: <Booking />,
-            },
-        ],
-    },
-    {
-        path: "/supplier/login",
-        element: <LoginSupplier />,
-    },
+  {
+    path: "/supplier",
+    element: <SupplierLayout />,
+    children: [
+        {
+          index: true,
+          element: <Dashboard />,
+        },
+        {
+          path: "activities",
+          element: <Activities />,
+        },
+        {
+          path: "image",
+          element: <ActivityImages />,
+        },
+        {
+          path: "schedules",
+          element: <ActivitySchedules />,
+        },
+        {
+          path: "booking",
+          element: <Booking />,
+        },
+    ],
+  },
+  {
+    path: "/supplier/login",
+    element: <LoginSupplier />,
+  },
 ];
