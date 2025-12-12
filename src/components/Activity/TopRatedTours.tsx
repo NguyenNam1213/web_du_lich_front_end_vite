@@ -1,54 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { ActivityService } from "../../api/activity.service";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setTours } from "../../store/slices/tourSlice";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { useNavigate } from "react-router-dom";
 
-const TourList: React.FC = () => {
+const TopRatedTours: React.FC = () => {
   const tours = useSelector((state: RootState) => state.tour.tours);
-  const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const toursPerSlide = 3; 
+  const toursPerSlide = 3;
 
-  useEffect(() => {
-    const fetchTours = async () => {
-      try {
-        const res = await ActivityService.getAllTour();
-        dispatch(setTours(res.data));
-      } catch (err) {
-        console.error("Error fetching tours:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTours();
-  }, []);
+  // ⭐ Lọc tour có rating >= 4 dựa vào reviews
+  const topRatedTours = tours
+    .map((tour) => {
+      const reviewCount = tour.reviews?.length || 0;
+      const averageRating =
+        reviewCount > 0
+          ? tour.reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
+          : 0;
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64 text-gray-500">
-        Đang tải danh sách tour...
-      </div>
-    );
-  }
+      return { ...tour, averageRating };
+    })
+    .filter((tour) => tour.averageRating >= 4);
 
-  if (tours.length === 0) {
-    return (
-      <div className="text-center text-gray-500 mt-10">
-        Không có tour nào được tìm thấy.
-      </div>
-    );
-  }
-
-  const featuredTours = tours
-    .filter((tour) => tour.featured === true)
-    .slice(0, 10);
-  const totalSlides = Math.ceil(featuredTours.length / toursPerSlide);
+  const totalSlides = Math.ceil(topRatedTours.length / toursPerSlide);
 
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev > 0 ? prev - 1 : totalSlides - 1));
@@ -57,24 +33,33 @@ const TourList: React.FC = () => {
   const handleNext = () => {
     setCurrentSlide((prev) => (prev < totalSlides - 1 ? prev + 1 : 0));
   };
+
   const startIndex = currentSlide * toursPerSlide;
-  const visibleTours = featuredTours.slice(startIndex, startIndex + toursPerSlide);
+  const visibleTours = topRatedTours.slice(startIndex, startIndex + toursPerSlide);
+
+  if (topRatedTours.length === 0) {
+    return (
+      <div className="text-center text-gray-500 mt-10">
+        Không có tour nào đạt đánh giá cao.
+      </div>
+    );
+  }
 
   return (
-    <div className="relative px-4 md:px-8 lg:px-12">
+    <div className="relative px-4 md:px-8 lg:px-12 mt-10">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold text-gray-800">
-          Các tour nổi bật
+            Các tour được đánh giá cao
         </h2>
 
         {/* ⭐ Nút xem tất cả */}
         <button
-          onClick={() => navigate("/tours/all?filter=featured")}
-          className="text-blue-600 hover:underline text-sm font-medium"
+            onClick={() => navigate("/tours/all?filter=top-rated")}
+            className="text-blue-600 hover:underline text-sm font-medium"
         >
-          Xem tất cả
+            Xem tất cả
         </button>
-      </div>
+        </div>
 
       <button
         onClick={handlePrev}
@@ -97,18 +82,10 @@ const TourList: React.FC = () => {
                 tour.images[0].imageUrl
               : "https://via.placeholder.com/300x200?text=No+Image";
 
-          const reviewCount = tour.reviews?.length || 0;
-          const averageRating =
-            reviewCount > 0
-              ? (
-                  tour.reviews.reduce((sum, r) => sum + r.rating, 0) /
-                  reviewCount
-                ).toFixed(1)
-              : "0.0";
           return (
             <div
               key={tour.id}
-              onClick={() => navigate(`/tours/${tour.id}`)} 
+              onClick={() => navigate(`/tours/${tour.id}`)}
               className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden cursor-pointer group"
             >
               <div className="relative">
@@ -117,11 +94,9 @@ const TourList: React.FC = () => {
                   alt={tour.name}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                {tour.featured && (
-                  <span className="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    Nổi bật
-                  </span>
-                )}
+                <span className="absolute top-2 left-2 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                  Đánh giá cao
+                </span>
               </div>
 
               <div className="p-4 flex flex-col justify-between h-[180px]">
@@ -131,7 +106,7 @@ const TourList: React.FC = () => {
                   </h3>
                   <div className="flex items-center text-sm text-gray-500 mt-1">
                     <Star size={16} className="text-yellow-400 mr-1" />
-                    <span>{averageRating || "Chưa có đánh giá"}</span>
+                    <span>{tour.averageRating.toFixed(1)}</span>
                     <span className="mx-2">•</span>
                     <span>{tour.destination?.name || "Không rõ địa điểm"}</span>
                   </div>
@@ -163,4 +138,4 @@ const TourList: React.FC = () => {
   );
 };
 
-export default TourList;
+export default TopRatedTours;

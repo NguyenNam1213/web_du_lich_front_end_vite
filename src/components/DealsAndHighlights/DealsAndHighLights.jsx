@@ -104,7 +104,7 @@ const tours = [
         </div>
       </div>
 
-      {/* --- CÁC HOẠT ĐỘNG NỔI BẬT --- */}
+      {/* --- CÁC HOẠT ĐỘNG NỔI BẬT ---
       <h2 className="section-title">Các hoạt động nổi bật</h2>
       <div className="activities-container">
         <button className="nav-btn left" onClick={prevTour}>
@@ -124,7 +124,7 @@ const tours = [
         <button className="nav-btn right" onClick={nextTour}>
           ›
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
