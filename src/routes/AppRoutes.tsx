@@ -31,15 +31,17 @@ import TourDetailPage from "../pages/TourDetail/TourDetailPage";
 import TourReviewPage from "../pages/TourReview/TourReviewPage";
 import WishList from "../pages/Profile/WishList";
 import BookingHistory from "../pages/Profile/BookingHistory";
+import AdminLogin from "../components/Admin/AdminLogin";
 
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
 
   if (loading) return <div>Loading...</div>;
-  if (!userData) return (
-    alert("You must be logged in to access this page."),
-    <Navigate to="/login" replace />
-  );
+  if (!userData)
+    return (
+      alert("You must be logged in to access this page."),
+      (<Navigate to="/login" replace />)
+    );
 
   return children;
 };
@@ -100,24 +102,27 @@ const AppRoutes = () => (
     />
 
     <Route element={<UserLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/tours/:id" element={<TourDetailPage />} />
-        <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
-        <Route path="/checkout/:id" element={<CheckoutPage />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/tours/:id" element={<TourDetailPage />} />
+      <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
+      <Route path="/checkout/:id" element={<CheckoutPage />} />
     </Route>
-    
+
+    {/* Admin Login Route */}
+    <Route path="/admin/login" element={<AdminLogin />} />
+
     <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="user" element={<ManageUser />} />
-        <Route path="supplier" element={<ManageSupplier />} />
-        <Route path="request-supplier" element={<ManageRequestSupplier />} />
-        <Route path="country" element={<ManageCountry />} />
-        <Route path="city" element={<ManageCity />} />
-        <Route path="destinations" element={<ManageDestination />} />
-        <Route path="notification" element={<ManageNotification />} />
-        <Route path="ratings" element={<ManageRatings />} />
-        <Route path="test" element={<Counter />} />
+      <Route index element={<DashboardPage />} />
+      <Route path="dashboard" element={<DashboardPage />} />
+      <Route path="user" element={<ManageUser />} />
+      <Route path="supplier" element={<ManageSupplier />} />
+      <Route path="request-supplier" element={<ManageRequestSupplier />} />
+      <Route path="country" element={<ManageCountry />} />
+      <Route path="city" element={<ManageCity />} />
+      <Route path="destinations" element={<ManageDestination />} />
+      <Route path="notification" element={<ManageNotification />} />
+      <Route path="ratings" element={<ManageRatings />} />
+      <Route path="test" element={<Counter />} />
     </Route>
     <Route path="/*" element={<AllRouter />} />
   </Routes>

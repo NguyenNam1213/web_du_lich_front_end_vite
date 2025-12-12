@@ -85,11 +85,11 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
     href: "/admin/destinations",
     icon: <MapPin className="text-gray-700 w-5 h-5" />,
   },
-  {
-    label: "Report Bug",
-    href: "/admin/bug",
-    icon: <Bug className="text-gray-700 w-5 h-5" />,
-  },
+  // {
+  //   label: "Report Bug",
+  //   href: "/admin/bug",
+  //   icon: <Bug className="text-gray-700 w-5 h-5" />,
+  // },
 
   {
     label: "Ratings & Recommendations",

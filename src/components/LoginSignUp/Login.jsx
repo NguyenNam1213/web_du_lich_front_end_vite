@@ -20,11 +20,11 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await login(email, password);
-     
+
       if (res.data && res.data.access_token) {
         localStorage.setItem("access_token", res.data.access_token);
         alert("Đăng nhập thành công!");
-        navigate("/")
+        navigate("/");
       } else {
         alert("Không nhận được token từ máy chủ!");
       }
