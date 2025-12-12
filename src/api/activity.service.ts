@@ -31,5 +31,12 @@ export const ActivityService = {
 
   getTourById(id: number): Promise<AxiosResponse<Activity>> {
     return instance.get(`/tours/activity/${id}`);
-  }
+  },
+
+  search(query: string): Promise<AxiosResponse<Activity[]>> {
+  return instance.get(`${BASE_URL}/search`, {
+    params: { query },
+  });
+},
+
 };

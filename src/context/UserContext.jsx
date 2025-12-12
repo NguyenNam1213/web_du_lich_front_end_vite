@@ -22,7 +22,7 @@ export const UserProvider = ({ children }) => {
         lastName: user.lastName || "",
         email: user.email,
         phone: user.phone || "",
-        image: avatarUrl,
+        avatar: avatarUrl,
         balance: user.balance ?? 0,
       });
     } catch (err) {

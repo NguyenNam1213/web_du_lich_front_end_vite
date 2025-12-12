@@ -11,33 +11,34 @@ export interface UpdateBookingStatusDto {
 const BASE_URL = "/supplier/bookings";
 
 export const BookingService = {
-  // 🔹 Lấy danh sách booking của supplier
+  // ===========================
+  // SUPPLIER (instance)
+  // ===========================
   getAll(): Promise<AxiosResponse<Booking[]>> {
     return instance.get(BASE_URL);
   },
-
-  // 🔹 Lấy chi tiết 1 booking
+  
   getById(id: number): Promise<AxiosResponse<Booking>> {
     return instance.get(`${BASE_URL}/${id}`);
   },
 
-  // 🔹 Cập nhật trạng thái booking
-  updateStatus(id: number, data: UpdateBookingStatusDto): Promise<AxiosResponse<Booking>> {
+  updateStatus(id: number, data: UpdateBookingStatusDto) {
     return instance.patch(`${BASE_URL}/${id}/status`, data);
   },
 
-  // 🔹 Xóa booking
-  delete(id: number): Promise<AxiosResponse<{ message: string }>> {
+  delete(id: number) {
     return instance.delete(`${BASE_URL}/${id}`);
   },
 
-  // USER
-  // 🔹 Tạo booking mới(user)
-  createBooking: async(payload: BookingCreateDto) =>  {
-    return api.post(BASE_URL, payload);
+  // ===========================
+  // USER (api)
+  // ===========================
+  createBooking(payload: BookingCreateDto) {
+    return instance.post(BASE_URL, payload);
+
   },
 
-  getMyBooking: async() => {
+  getMyBooking() {
     return api.get(`${BASE_URL}/my-booking`);
-  }
+  },
 };
