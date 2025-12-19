@@ -33,11 +33,10 @@ import TourDetailPage from "../pages/TourDetail/TourDetailPage";
 import TourReviewPage from "../pages/TourReview/TourReviewPage";
 import WishList from "../pages/Profile/WishList";
 import BookingHistory from "../pages/Profile/BookingHistory";
-import AllToursPage from "../pages/Activity/AllToursPage";
-import AdminLogin from "../components/Admin/AdminLogin";
-import AdminProtectedRoute from "../components/Admin/AdminProtectedRoute";
 import CouponsPage from "../pages/Profile/CouponsPage";
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+import AdminLogin from "../components/Admin/AdminLogin";
+import AllToursPage from "../pages/Activity/AllToursPage";
+const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
 
   if (loading) return <div>Loading...</div>;
@@ -55,70 +54,60 @@ const AppRoutes = () => (
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
     <Route path="/login-success" element={<LoginSuccess />} />
-
-    <Route
-      path="/profile"
-      element={
-        <ProtectedRoute>
-          <Profile />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/account-settings"
-      element={
-        <ProtectedRoute>
-          <AccountSettings />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/gift-cards"
-      element={
-        <ProtectedRoute>
-          <GiftCard />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/profile/wishlist"
-      element={
-        <ProtectedRoute>
-          <WishList />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/profile/coupons"
-      element={
-        <ProtectedRoute>
-          <CouponsPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/profile/booking-history"
-      element={
-        <ProtectedRoute>
-          <BookingHistory />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/supplier-request"
-      element={
-        <ProtectedRoute>
-          <SupplierRequest />
-        </ProtectedRoute>
-      }
-    />
-
     <Route element={<UserLayout />}>
       <Route path="/" element={<Home />} />
       <Route path="/tours/:id" element={<TourDetailPage />} />
       <Route path="/tours/all" element={<AllToursPage />} />
       <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
       <Route path="/checkout/:id" element={<CheckoutPage />} />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account-settings"
+        element={
+          <ProtectedRoute>
+            <AccountSettings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/wishlist"
+        element={
+          <ProtectedRoute>
+            <WishList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/coupons"
+        element={
+          <ProtectedRoute>
+            <CouponsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/booking-history"
+        element={
+          <ProtectedRoute>
+            <BookingHistory />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/supplier-request"
+        element={
+          <ProtectedRoute>
+            <SupplierRequest />
+          </ProtectedRoute>
+        }
+      />
     </Route>
 
     {/* Admin Login Route */}
