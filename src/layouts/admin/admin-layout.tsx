@@ -9,7 +9,7 @@ import { Outlet } from "react-router-dom";
 import { getUnreadNotificationsCount } from "../../services/api/notificationApi";
 
 interface AdminLayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   userAvatar?: string;
   userName?: string;
   unreadNotifications?: boolean;

@@ -5,15 +5,11 @@ import { useUser } from "../../context/UserContext";
 export default function LoginSuccess() {
   const navigate = useNavigate();
   const { fetchProfile } = useUser();
-
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-
     if (token) {
       localStorage.setItem("access_token", token);
-
-      // Use fetchProfile from context
       fetchProfile()
         .then(() => {
           navigate("/", { replace: true });
@@ -26,6 +22,5 @@ export default function LoginSuccess() {
       navigate("/login", { replace: true });
     }
   }, [navigate, fetchProfile]);
-
   return <div>Đang đăng nhập...</div>;
 }

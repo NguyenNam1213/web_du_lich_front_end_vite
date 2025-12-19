@@ -1,3 +1,4 @@
+import React from "react";
 import Home from "../pages/Home";
 import {
   BrowserRouter as Router,
@@ -111,7 +112,14 @@ const AppRoutes = () => (
     {/* Admin Login Route */}
     <Route path="/admin/login" element={<AdminLogin />} />
 
-    <Route path="/admin" element={<AdminLayout />}>
+    <Route
+      path="/admin"
+      element={
+        <AdminProtectedRoute>
+          <AdminLayout />
+        </AdminProtectedRoute>
+      }
+    >
       <Route index element={<DashboardPage />} />
       <Route path="dashboard" element={<DashboardPage />} />
       <Route path="user" element={<ManageUser />} />
