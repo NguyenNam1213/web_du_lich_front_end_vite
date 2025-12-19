@@ -31,6 +31,7 @@ import TourDetailPage from "../pages/TourDetail/TourDetailPage";
 import TourReviewPage from "../pages/TourReview/TourReviewPage";
 import WishList from "../pages/Profile/WishList";
 import BookingHistory from "../pages/Profile/BookingHistory";
+import CouponsPage from "../pages/Profile/CouponsPage";
 
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
@@ -83,6 +84,14 @@ const AppRoutes = () => (
       }
     />
     <Route
+      path="/profile/coupons"
+      element={
+        <ProtectedRoute>
+          <CouponsPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path="/profile/booking-history"
       element={
         <ProtectedRoute>
@@ -100,24 +109,24 @@ const AppRoutes = () => (
     />
 
     <Route element={<UserLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/tours/:id" element={<TourDetailPage />} />
-        <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
-        <Route path="/checkout/:id" element={<CheckoutPage />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/tours/:id" element={<TourDetailPage />} />
+      <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
+      <Route path="/checkout/:id" element={<CheckoutPage />} />
     </Route>
-    
+
     <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="user" element={<ManageUser />} />
-        <Route path="supplier" element={<ManageSupplier />} />
-        <Route path="request-supplier" element={<ManageRequestSupplier />} />
-        <Route path="country" element={<ManageCountry />} />
-        <Route path="city" element={<ManageCity />} />
-        <Route path="destinations" element={<ManageDestination />} />
-        <Route path="notification" element={<ManageNotification />} />
-        <Route path="ratings" element={<ManageRatings />} />
-        <Route path="test" element={<Counter />} />
+      <Route index element={<DashboardPage />} />
+      <Route path="dashboard" element={<DashboardPage />} />
+      <Route path="user" element={<ManageUser />} />
+      <Route path="supplier" element={<ManageSupplier />} />
+      <Route path="request-supplier" element={<ManageRequestSupplier />} />
+      <Route path="country" element={<ManageCountry />} />
+      <Route path="city" element={<ManageCity />} />
+      <Route path="destinations" element={<ManageDestination />} />
+      <Route path="notification" element={<ManageNotification />} />
+      <Route path="ratings" element={<ManageRatings />} />
+      <Route path="test" element={<Counter />} />
     </Route>
     <Route path="/*" element={<AllRouter />} />
   </Routes>

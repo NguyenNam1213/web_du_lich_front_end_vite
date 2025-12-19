@@ -11,7 +11,6 @@ const Navbar = () => {
   const [searchText, setSearchText] = useState("");
   const [results, setResults] = useState([]);
 
-  // Gọi API khi người dùng nhập (debounce nhẹ)
   useEffect(() => {
     const delay = setTimeout(() => {
       if (searchText.trim() === "") {

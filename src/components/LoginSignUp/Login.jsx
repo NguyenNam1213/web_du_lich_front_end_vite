@@ -4,9 +4,10 @@ import email_icon from "../../assets/email.png";
 import password_icon from "../../assets/password.png";
 import "./LoginSignUp.css";
 import { login } from "../../api/auth";
-
+import { useUser } from "../../context/UserContext";
 const Login = () => {
   const navigate = useNavigate();
+  const { fetchProfile } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,7 @@ const Login = () => {
      
       if (res.data && res.data.access_token) {
         localStorage.setItem("access_token", res.data.access_token);
+        await fetchProfile();
         alert("Đăng nhập thành công!");
         navigate("/")
       } else {

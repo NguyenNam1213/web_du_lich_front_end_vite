@@ -5,23 +5,30 @@ import user_icon from "../../assets/person.png";
 import password_icon from "../../assets/password.png";
 import "./LoginSignUp.css";
 import { register } from "../../api/auth";
-
+import { useUser } from "../../context/UserContext";
 const Signup = () => {
   const navigate = useNavigate();
+  const { fetchProfile } = useUser();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSignUp = async () => {
     try {
-      await register(email, password);
-      alert("Đăng ký thành công");
-      navigate("/login");
+      const res = await register(email, password);
+
+      if (res.data?.access_token) {
+        localStorage.setItem("access_token", res.data.access_token);
+        await fetchProfile();
+        alert("Đăng ký thành công");
+        navigate("/");
+      }
     } catch (err) {
       console.error(err.response?.data || err);
       alert("Email đã tồn tại hoặc lỗi server");
     }
   };
+
 
   const handleToLogin = () => {
     navigate("/login");

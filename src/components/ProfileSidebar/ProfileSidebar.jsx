@@ -1,15 +1,13 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import "./ProfileSideBar.css";
 import { useNavigate } from "react-router-dom";
-import { uploadAvatar } from "../../api/user"; 
+import { uploadAvatar } from "../../api/user";
 import { useUser } from "../../context/UserContext";
+
+const API_URL = "http://localhost:3000";
+
 const ProfileSidebar = () => {
-  const { userData, setUserData } = useUser();
-
-  useEffect(() => {
-    console.log("Avatar đã cập nhật:", userData.image);
-  }, [userData.image]);
-
+  const { userData, fetchProfile } = useUser();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
@@ -26,26 +24,8 @@ const ProfileSidebar = () => {
       setUploading(true);
       const res = await uploadAvatar(file);
       console.log("Upload response:", res.data);
+      await fetchProfile();
 
-      let avatarUrl = res.data?.avatar;
-
-      if (!avatarUrl) {
-        throw new Error(
-          "Không tìm thấy đường dẫn avatar trong phản hồi server"
-        );
-      }
-
-      if (avatarUrl.startsWith("/uploads")) {
-        avatarUrl = `http://localhost:3000${avatarUrl}`;
-      }
-
-      setUserData((prev) => ({
-        ...prev,
-        image: avatarUrl,
-      }));
-
-      console.log("Ảnh trả về từ server:", avatarUrl);
-      
       alert("Cập nhật ảnh đại diện thành công!");
     } catch (err) {
       console.error("Lỗi khi upload avatar:", err);
@@ -55,15 +35,15 @@ const ProfileSidebar = () => {
     }
   };
 
-  
+  if (!userData) return null;
+
   return (
     <div className="profile-sidebar">
       <div className="avatar-container" onClick={handleAvatarClick}>
         <img
-          key={userData.image}
           src={
-            userData.image
-              ? userData.image
+            userData.avatar
+              ? userData.avatar
               : "https://via.placeholder.com/150?text=No+Avatar"
           }
           alt="avatar"
@@ -99,7 +79,10 @@ const ProfileSidebar = () => {
         <p className="level-text">4 benefits, 1X KlookCash</p>
       </div>
 
-      <div className="sidebar-section">
+      <div
+        className="sidebar-section"
+        onClick={() => navigate("/profile/coupons")}
+      >
         <p>Mã giảm giá </p>
         <p>Xem</p>
       </div>
@@ -113,13 +96,22 @@ const ProfileSidebar = () => {
       <div className="sidebar-section" onClick={() => navigate("/profile")}>
         <p>Thông tin cá nhân</p>
       </div>
-      <div className="sidebar-section" onClick={() => navigate("/profile/wishlist")}>
+      <div
+        className="sidebar-section"
+        onClick={() => navigate("/profile/wishlist")}
+      >
         <p>Wishlist</p>
       </div>
-      <div className="sidebar-section" onClick={() => navigate("/profile/booking-history")}>
+      <div
+        className="sidebar-section"
+        onClick={() => navigate("/profile/booking-history")}
+      >
         <p>Lịch sử đặt tour</p>
       </div>
-      <div className="sidebar-section" onClick={() => navigate("/supplier-request")}>
+      <div
+        className="sidebar-section"
+        onClick={() => navigate("/supplier-request")}
+      >
         <p>Yêu cầu Supplier</p>
       </div>
     </div>
