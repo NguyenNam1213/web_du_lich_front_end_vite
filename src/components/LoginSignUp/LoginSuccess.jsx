@@ -1,34 +1,38 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from  "../../context/UserContext";
-import { getProfile } from "../../api/user";
+import { useUser } from "../../context/UserContext";
 
 export default function LoginSuccess() {
   const navigate = useNavigate();
-  const { setUserData } = useUser();
+  const { fetchProfile } = useUser();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
+    const handleLoginSuccess = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
 
-    if (token) {
-      localStorage.setItem("access_token", token);
+      if (token) {
+        localStorage.setItem("access_token", token);
 
-      // Gọi API lấy profile user
-      getProfile()
-        .then((res) => {
-          setUserData({
-            ...res.data, // dữ liệu user từ backend
-            isAuthenticated: true,
-          });
+        try {
+          // Gọi fetchProfile để lấy thông tin user và cập nhật context
+          await fetchProfile();
+          // alert("Đăng nhập thành công!");
           navigate("/");
-        })
-        .catch(() => {
+        } catch (error) {
+          console.error("Lỗi khi lấy profile:", error);
+          // alert(
+          //   "Đăng nhập thành công nhưng không thể tải thông tin người dùng!"
+          // );
           navigate("/login");
-        });
-    } else {
-      navigate("/login");
-    }
+        }
+      } else {
+        navigate("/login");
+      }
+    };
+
+    handleLoginSuccess();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <div>Đang đăng nhập...</div>;

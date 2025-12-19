@@ -1,3 +1,4 @@
+import React from "react";
 import Home from "../pages/Home";
 import {
   BrowserRouter as Router,
@@ -31,7 +32,11 @@ import TourDetailPage from "../pages/TourDetail/TourDetailPage";
 import TourReviewPage from "../pages/TourReview/TourReviewPage";
 import WishList from "../pages/Profile/WishList";
 import BookingHistory from "../pages/Profile/BookingHistory";
-const ProtectedRoute = ({ children }) => {
+import AllToursPage from "../pages/Activity/AllToursPage";
+import AdminLogin from "../components/Admin/AdminLogin";
+import AdminProtectedRoute from "../components/Admin/AdminProtectedRoute";
+import CouponsPage from "../pages/Profile/CouponsPage";
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { userData, loading } = useUser();
 
   if (loading) return <div>Loading...</div>;
@@ -110,7 +115,7 @@ const AppRoutes = () => (
     <Route element={<UserLayout />}>
       <Route path="/" element={<Home />} />
       <Route path="/tours/:id" element={<TourDetailPage />} />
-        <Route path="/tours/all" element={<AllToursPage />} />
+      <Route path="/tours/all" element={<AllToursPage />} />
       <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
       <Route path="/checkout/:id" element={<CheckoutPage />} />
     </Route>
@@ -118,7 +123,14 @@ const AppRoutes = () => (
     {/* Admin Login Route */}
     <Route path="/admin/login" element={<AdminLogin />} />
 
-    <Route path="/admin" element={<AdminLayout />}>
+    <Route
+      path="/admin"
+      element={
+        <AdminProtectedRoute>
+          <AdminLayout />
+        </AdminProtectedRoute>
+      }
+    >
       <Route index element={<DashboardPage />} />
       <Route path="dashboard" element={<DashboardPage />} />
       <Route path="user" element={<ManageUser />} />
