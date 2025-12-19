@@ -25,8 +25,8 @@ const Login = () => {
       if (res.data && res.data.access_token) {
         localStorage.setItem("access_token", res.data.access_token);
         await fetchProfile();
-        // alert("Đăng nhập thành công!");
-        navigate("/");
+        alert("Đăng nhập thành công!");
+        navigate("/", {replace: true});
       } else {
         alert("Không nhận được token từ máy chủ!");
       }
