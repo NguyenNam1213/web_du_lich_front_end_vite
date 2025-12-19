@@ -13,7 +13,7 @@ const TourList: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const toursPerSlide = 3; 
+  const toursPerSlide = 4; 
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -47,7 +47,7 @@ const TourList: React.FC = () => {
 
   const featuredTours = tours
     .filter((tour) => tour.featured === true)
-    .slice(0, 10);
+    .slice(0, 20);
   const totalSlides = Math.ceil(featuredTours.length / toursPerSlide);
 
   const handlePrev = () => {
@@ -61,7 +61,7 @@ const TourList: React.FC = () => {
   const visibleTours = featuredTours.slice(startIndex, startIndex + toursPerSlide);
 
   return (
-    <div className="relative px-4 md:px-8 lg:px-12">
+    <div className="relative px-4 md:px-8 lg:px-12 mt-10 max-w-[90%] mx-auto">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold text-gray-800">
           Các tour nổi bật
@@ -89,7 +89,7 @@ const TourList: React.FC = () => {
         <ChevronRight size={20} />
       </button>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-500">
         {visibleTours.map((tour) => {
           const imageUrl =
             tour.images && tour.images.length > 0
@@ -124,7 +124,7 @@ const TourList: React.FC = () => {
                 )}
               </div>
 
-              <div className="p-4 flex flex-col justify-between h-[180px]">
+              <div className="p-4 flex flex-col justify-between h-[140px]">
                 <div>
                   <h3 className="font-semibold text-lg line-clamp-2 text-gray-800">
                     {tour.name}
@@ -137,7 +137,7 @@ const TourList: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-3">
+                <div className="mt-2">
                   <p className="text-lg font-bold text-blue-600">
                     {parseFloat(tour.price).toLocaleString("vi-VN")} {tour.currency}
                   </p>

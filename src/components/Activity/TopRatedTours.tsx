@@ -9,7 +9,7 @@ const TopRatedTours: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
 
-  const toursPerSlide = 3;
+  const toursPerSlide = 4;
 
   // ⭐ Lọc tour có rating >= 4 dựa vào reviews
   const topRatedTours = tours
@@ -46,7 +46,7 @@ const TopRatedTours: React.FC = () => {
   }
 
   return (
-    <div className="relative px-4 md:px-8 lg:px-12 mt-10">
+    <div className="relative px-4 md:px-8 lg:px-12 mt-10 max-w-[90%] mx-auto">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold text-gray-800">
             Các tour được đánh giá cao
@@ -74,7 +74,7 @@ const TopRatedTours: React.FC = () => {
         <ChevronRight size={20} />
       </button>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-500">
         {visibleTours.map((tour) => {
           const imageUrl =
             tour.images && tour.images.length > 0
@@ -99,7 +99,7 @@ const TopRatedTours: React.FC = () => {
                 </span>
               </div>
 
-              <div className="p-4 flex flex-col justify-between h-[180px]">
+              <div className="p-4 flex flex-col justify-between h-[140px]">
                 <div>
                   <h3 className="font-semibold text-lg line-clamp-2 text-gray-800">
                     {tour.name}
@@ -112,7 +112,7 @@ const TopRatedTours: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-3">
+                <div className="mt-2">
                   <p className="text-lg font-bold text-blue-600">
                     {parseFloat(tour.price).toLocaleString("vi-VN")} {tour.currency}
                   </p>
