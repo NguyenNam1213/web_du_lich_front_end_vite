@@ -20,6 +20,7 @@ const Signup = () => {
       if (res.data?.access_token) {
         localStorage.setItem("access_token", res.data.access_token);
         await fetchProfile();
+        console.log("FETCH PROFILE DONE");
         alert("Đăng ký thành công");
         navigate("/");
       }

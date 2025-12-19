@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from  "../../context/UserContext";
-import { getProfile } from "../../api/user";
+import { useUser } from "../../context/UserContext";
 
 export default function LoginSuccess() {
   const navigate = useNavigate();
-  const { setUserData } = useUser();
+  const { fetchProfile } = useUser();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -14,22 +13,19 @@ export default function LoginSuccess() {
     if (token) {
       localStorage.setItem("access_token", token);
 
-      // Gọi API lấy profile user
-      getProfile()
-        .then((res) => {
-          setUserData({
-            ...res.data, // dữ liệu user từ backend
-            isAuthenticated: true,
-          });
-          navigate("/");
+      // Use fetchProfile from context
+      fetchProfile()
+        .then(() => {
+          navigate("/", { replace: true });
         })
-        .catch(() => {
-          navigate("/login");
+        .catch((err) => {
+          console.error("Failed to fetch profile:", err);
+          navigate("/login", { replace: true });
         });
     } else {
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
-  }, []);
+  }, [navigate, fetchProfile]);
 
   return <div>Đang đăng nhập...</div>;
 }
