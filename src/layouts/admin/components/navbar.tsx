@@ -29,12 +29,12 @@ export function Navbar({ onMenuToggle, hasUnread = false }: NavbarProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+          {/* <button className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
             <Bell size={20} className="text-gray-700 dark:text-gray-300" />
             {hasUnread && (
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             )}
-          </button>
+          </button> */}
 
           <div className="relative">
             <button
