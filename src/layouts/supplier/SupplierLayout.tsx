@@ -18,12 +18,10 @@ const SupplierLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 🔹 Kiểm tra token khi vào trang
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const storedUser = localStorage.getItem("user");
 
-    // Nếu chưa đăng nhập → chuyển hướng về trang login
     if (!token || !storedUser) {
       navigate("/supplier/login", { replace: true });
       return;
@@ -43,7 +41,6 @@ const SupplierLayout = () => {
     }
   }, [navigate]);
 
-  // 🔹 Xử lý đăng xuất
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
@@ -51,14 +48,13 @@ const SupplierLayout = () => {
   };
 
   const menuItems = [
-    { label: "Dashboard", path: "/supplier", icon: <LayoutDashboard size={18} /> },
+    // { label: "Dashboard", path: "/supplier", icon: <LayoutDashboard size={18} /> },
     { label: "Activities", path: "/supplier/activities", icon: <Calendar size={18} /> },
     { label: "Images", path: "/supplier/image", icon: <ImageIcon size={18} /> },
     { label: "Schedules", path: "/supplier/schedules", icon: <Calendar size={18} /> },
     { label: "Bookings", path: "/supplier/booking", icon: <ShoppingBag size={18} /> },
   ];
 
-  // Nếu chưa có user thì không render layout (tránh lỗi flash khi redirect)
   if (!user) return null;
 
   return (

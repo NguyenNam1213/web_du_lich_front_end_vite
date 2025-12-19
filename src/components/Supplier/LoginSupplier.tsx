@@ -17,9 +17,8 @@ export default function LoginSupplier() {
     try {
       const res = await AuthService.login({ email, password });
       localStorage.setItem("access_token", res.access_token);
-      localStorage.setItem("user", JSON.stringify({ email }));
 
-      navigate("/supplier"); 
+      navigate("/supplier/activities", { replace: true }); 
     } catch (err: any) {
       setError(err.response?.data?.message || "Đăng nhập thất bại");
     } finally {
