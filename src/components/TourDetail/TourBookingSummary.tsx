@@ -3,6 +3,7 @@ import { Calendar, Users, Check } from "lucide-react";
 import { Activity } from "../../types/activity";
 import { useNavigate } from "react-router-dom";
 import { BookingService } from "../../api/booking.service";
+import { useUser } from "../../context/UserContext";
 
 interface TourBookingSummaryProps {
   tour?: Activity;
@@ -12,6 +13,8 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
   const [date, setDate] = useState<string>("");
   const [participants, setParticipants] = useState<number>(1);
   const [error, setError] = useState<string>("");
+  const {userData} = useUser();
+  console.log("User Data in Booking Summary:", userData);
 
   const navigate = useNavigate();
 
@@ -39,9 +42,9 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
         supplierId: Number(tour.supplier?.id),
         scheduleId: Number(tour.schedules?.[0]?.id || 1), 
 
-        customerName: "User Name", 
-        customerEmail: "user@gmail.com",
-        customerPhone: "0123456789",
+        customerName: userData ? `${userData.firstName} ${userData.lastName}` : "Khách hàng", 
+        customerEmail: userData.email,
+        customerPhone: userData.phone,
 
         bookingDate: date,
         participants: participants,

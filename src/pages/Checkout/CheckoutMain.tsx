@@ -14,9 +14,9 @@ const CheckoutMain: React.FC = () => {
       </div>
 
       {/* Thông tin hành khách */}
-      <div className="bg-white p-6 rounded-2xl shadow-md">
+      {/* <div className="bg-white p-6 rounded-2xl shadow-md">
         <CheckoutTravellerInfo />
-      </div>
+      </div> */}
 
       {/* Yêu cầu bổ sung */}
       <div className="bg-white p-6 rounded-2xl shadow-md">

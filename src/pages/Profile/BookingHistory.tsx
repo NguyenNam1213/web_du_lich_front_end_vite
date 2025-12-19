@@ -22,6 +22,16 @@ const BookingHistory = () => {
 
   const navigate = useNavigate();
 
+  const getStatusInVietnamese = (status) => {
+    const statusMap = {
+      'pending': 'Chờ xác nhận',
+      'confirmed': 'Đã xác nhận',
+      'cancelled': 'Đã hủy',
+      'completed': 'Hoàn thành'
+    };
+    return statusMap[status.toLowerCase()] || status;
+  };
+
   useEffect(() => {
     const fetchBooking = async() => {
       try {
@@ -254,7 +264,7 @@ const BookingHistory = () => {
                       <p className="text-sm text-gray-600">
                         Trạng thái:{" "}
                         <span className="font-medium capitalize text-blue-600">
-                          {item.status}
+                          {getStatusInVietnamese(item.status)}
                         </span>
                       </p>
                     </div>

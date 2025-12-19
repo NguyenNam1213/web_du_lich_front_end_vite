@@ -31,16 +31,15 @@ import TourDetailPage from "../pages/TourDetail/TourDetailPage";
 import TourReviewPage from "../pages/TourReview/TourReviewPage";
 import WishList from "../pages/Profile/WishList";
 import BookingHistory from "../pages/Profile/BookingHistory";
-import CouponsPage from "../pages/Profile/CouponsPage";
-
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
 
   if (loading) return <div>Loading...</div>;
-  if (!userData) return (
-    alert("You must be logged in to access this page."),
-    <Navigate to="/login" replace />
-  );
+  if (!userData)
+    return (
+      alert("You must be logged in to access this page."),
+      (<Navigate to="/login" replace />)
+    );
 
   return children;
 };
@@ -111,9 +110,13 @@ const AppRoutes = () => (
     <Route element={<UserLayout />}>
       <Route path="/" element={<Home />} />
       <Route path="/tours/:id" element={<TourDetailPage />} />
+        <Route path="/tours/all" element={<AllToursPage />} />
       <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
       <Route path="/checkout/:id" element={<CheckoutPage />} />
     </Route>
+
+    {/* Admin Login Route */}
+    <Route path="/admin/login" element={<AdminLogin />} />
 
     <Route path="/admin" element={<AdminLayout />}>
       <Route index element={<DashboardPage />} />
