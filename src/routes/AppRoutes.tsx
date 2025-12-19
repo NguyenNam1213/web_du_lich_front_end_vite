@@ -26,6 +26,7 @@ import ManageSupplier from "../layouts/admin/pages/manage-supplier";
 import ManageRequestSupplier from "../layouts/admin/pages/manage-request-supplier";
 import ManageUser from "../layouts/admin/pages/manage-user";
 import ManageRatings from "../layouts/admin/pages/manage-ratings";
+import ManageTransactions from "../layouts/admin/pages/manage-transactions";
 import UserLayout from "../layouts/user/UserLayout";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
 import TourDetailPage from "../pages/TourDetail/TourDetailPage";
@@ -141,6 +142,7 @@ const AppRoutes = () => (
       <Route path="destinations" element={<ManageDestination />} />
       <Route path="notification" element={<ManageNotification />} />
       <Route path="ratings" element={<ManageRatings />} />
+      <Route path="transactions" element={<ManageTransactions />} />
       <Route path="test" element={<Counter />} />
     </Route>
     <Route path="/*" element={<AllRouter />} />
