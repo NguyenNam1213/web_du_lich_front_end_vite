@@ -35,6 +35,24 @@ class PaymentService {
     const res = await api.get("/payments/bank-info");
     return res.data;
   }
+
+  async importTransactions(file: File): Promise<{
+    message: string;
+    processed: number;
+    updated: number;
+    errors: number;
+    details: Array<{ bookingId: string; status: string; message: string }>;
+  }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    const res = await api.post("/payments/import-transactions", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  }
 }
 
 export default new PaymentService();

@@ -9,6 +9,7 @@ import {
   MapPin,
   Building2,
   Star,
+  CreditCard,
 } from "lucide-react";
 import type React from "react";
 
@@ -96,16 +97,21 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
     href: "/admin/ratings",
     icon: <Star className="text-gray-700 w-5 h-5" />,
   },
+  // {
+  //   label: "Notifications",
+  //   href: "/admin/notification",
+  //   icon: (
+  //     <div className="relative">
+  //       <Bell className="text-gray-700 w-5 h-5" />
+  //       {unreadNotifications && (
+  //         <span className="absolute top-1/2 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+  //       )}
+  //     </div>
+  //   ),
+  // },
   {
-    label: "Notifications",
-    href: "/admin/notification",
-    icon: (
-      <div className="relative">
-        <Bell className="text-gray-700 w-5 h-5" />
-        {unreadNotifications && (
-          <span className="absolute top-1/2 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-        )}
-      </div>
-    ),
+    label: "Transactions",
+    href: "/admin/transactions",
+    icon: <CreditCard className="text-gray-700 w-5 h-5" />,
   },
 ];
