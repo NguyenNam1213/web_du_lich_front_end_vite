@@ -11,6 +11,7 @@ import {
   Star,
   CreditCard,
   Clock,
+  Ticket,
 } from "lucide-react";
 import type React from "react";
 
@@ -119,5 +120,10 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
     label: "Transactions",
     href: "/admin/transactions",
     icon: <CreditCard className="text-gray-700 w-5 h-5" />,
+  },
+  {
+    label: "Coupons",
+    href: "/admin/coupon",
+    icon: <Ticket className="text-gray-700 w-5 h-5" />,
   },
 ];
