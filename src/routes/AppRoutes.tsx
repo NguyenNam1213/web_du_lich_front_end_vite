@@ -27,6 +27,7 @@ import ManageRequestSupplier from "../layouts/admin/pages/manage-request-supplie
 import ManageUser from "../layouts/admin/pages/manage-user";
 import ManageRatings from "../layouts/admin/pages/manage-ratings";
 import ManageTransactions from "../layouts/admin/pages/manage-transactions";
+import ManageScheduler from "../layouts/admin/pages/manage-scheduler";
 import UserLayout from "../layouts/user/UserLayout";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
 import TourDetailPage from "../pages/TourDetail/TourDetailPage";
@@ -36,6 +37,7 @@ import BookingHistory from "../pages/Profile/BookingHistory";
 import CouponsPage from "../pages/Profile/CouponsPage";
 import AdminLogin from "../components/Admin/AdminLogin";
 import AllToursPage from "../pages/Activity/AllToursPage";
+import AdminProtectedRoute from "../components/Admin/AdminProtectedRoute";
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
 
@@ -132,6 +134,7 @@ const AppRoutes = () => (
       <Route path="notification" element={<ManageNotification />} />
       <Route path="ratings" element={<ManageRatings />} />
       <Route path="transactions" element={<ManageTransactions />} />
+      <Route path="scheduler" element={<ManageScheduler />} />
       <Route path="test" element={<Counter />} />
     </Route>
     <Route path="/*" element={<AllRouter />} />

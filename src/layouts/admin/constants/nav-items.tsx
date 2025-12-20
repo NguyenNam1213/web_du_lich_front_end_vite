@@ -10,6 +10,7 @@ import {
   Building2,
   Star,
   CreditCard,
+  Clock,
 } from "lucide-react";
 import type React from "react";
 
@@ -96,6 +97,11 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
     label: "Ratings & Recommendations",
     href: "/admin/ratings",
     icon: <Star className="text-gray-700 w-5 h-5" />,
+  },
+  {
+    label: "Scheduler",
+    href: "/admin/scheduler",
+    icon: <Clock className="text-gray-700 w-5 h-5" />,
   },
   // {
   //   label: "Notifications",
