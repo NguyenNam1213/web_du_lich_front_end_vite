@@ -72,7 +72,12 @@ export const SupplierRequestService = {
   },
 
   // Lấy tất cả requests (admin)
-  getAll(filters?: FilterRequestsDto): Promise<AxiosResponse<SupplierRequest[]>> {
+  getAll(filters?: FilterRequestsDto & { page?: number; limit?: number }): Promise<AxiosResponse<{
+    requests: SupplierRequest[];
+    total: number;
+    totalPages: number;
+    currentPage: number;
+  }>> {
     return instance.get(BASE_URL, { params: filters });
   },
 

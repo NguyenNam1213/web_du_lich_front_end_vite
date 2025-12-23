@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   exportRatingsToCSV,
   exportActivitiesToCSV,
-  importRecommendationsFromCSV,
+  importRecommendationsDefault,
   getRecommendationsStats,
 } from "../../../api/recommendations.service";
 import { Download, Upload, FileText, BarChart3, Loader2 } from "lucide-react";
@@ -28,11 +28,13 @@ export default function ManageRatings() {
 
       // Gọi API để export và lấy file path
       const result = await exportRatingsToCSV();
-      
+
       // Tạo download link từ file path
       // Giả sử file được serve qua static file server
-      const downloadUrl = `${import.meta.env.VITE_API_BASE_URL}/${result.filePath.replace(/\\/g, '/')}`;
-      
+      const downloadUrl = `${
+        import.meta.env.VITE_API_BASE_URL
+      }/${result.filePath.replace(/\\/g, "/")}`;
+
       // Tải file
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -41,7 +43,7 @@ export default function ManageRatings() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       showMessage("success", `Đã xuất và tải ratings.csv thành công!`);
     } catch (error: any) {
       showMessage(
@@ -59,10 +61,12 @@ export default function ManageRatings() {
       setMessage(null);
 
       const result = await exportActivitiesToCSV();
-      
+
       // Tạo download link từ file path
-      const downloadUrl = `${import.meta.env.VITE_API_BASE_URL}/${result.filePath.replace(/\\/g, '/')}`;
-      
+      const downloadUrl = `${
+        import.meta.env.VITE_API_BASE_URL
+      }/${result.filePath.replace(/\\/g, "/")}`;
+
       // Tải file
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -71,7 +75,7 @@ export default function ManageRatings() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       showMessage("success", `Đã xuất và tải activities.csv thành công!`);
     } catch (error: any) {
       showMessage(
@@ -83,33 +87,22 @@ export default function ManageRatings() {
     }
   };
 
-  const handleImportRecommendations = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleImportRecommendations = async () => {
     try {
       setLoading(true);
       setMessage(null);
 
-      // Upload file lên server trước
-      const formData = new FormData();
-      formData.append("file", file);
+      const result = await importRecommendationsDefault();
 
-      // Giả sử backend có endpoint upload file
-      // Hoặc client-side đọc file và gửi filePath
-      const filePath = `exports/${file.name}`;
-
-      const result = await importRecommendationsFromCSV(filePath);
-      
       showMessage(
         "success",
-        `Đã import ${result.imported} recommendations. ${result.errors > 0 ? `Có ${result.errors} lỗi.` : ""}`
+        `Đã import ${result.imported} recommendations. ${
+          result.errors > 0 ? `Có ${result.errors} lỗi.` : ""
+        }`
       );
 
       // Reload stats
-      if (stats) {
-        loadStats();
-      }
+      loadStats();
     } catch (error: any) {
       showMessage(
         "error",
@@ -117,7 +110,6 @@ export default function ManageRatings() {
       );
     } finally {
       setLoading(false);
-      e.target.value = ""; // Reset input
     }
   };
 
@@ -139,7 +131,9 @@ export default function ManageRatings() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">Quản lý Rating & Recommendations</h1>
+      <h1 className="text-2xl font-semibold mb-6">
+        Quản lý Rating & Recommendations
+      </h1>
 
       {/* Message */}
       {message && (
@@ -235,8 +229,13 @@ export default function ManageRatings() {
         <div className="mt-4 p-4 bg-gray-50 rounded-lg">
           <p className="text-sm font-semibold mb-2">Hướng dẫn:</p>
           <ol className="text-sm text-gray-600 list-decimal list-inside space-y-1">
-            <li>Nhấn "Xuất Ratings CSV" để tải file ratings.csv (format ml-100k)</li>
-            <li>Nhấn "Xuất Activities CSV" để tải file activities.csv với category features</li>
+            <li>
+              Nhấn "Xuất Ratings CSV" để tải file ratings.csv (format ml-100k)
+            </li>
+            <li>
+              Nhấn "Xuất Activities CSV" để tải file activities.csv với category
+              features
+            </li>
             <li>Copy 2 files vào folder rcm/implementation</li>
             <li>Chạy Python script: python hybrid_cf_cb.py</li>
             <li>Import file recommendations.csv kết quả vào hệ thống</li>
@@ -255,26 +254,23 @@ export default function ManageRatings() {
           Import file recommendations.csv từ Python script vào database
         </p>
 
-        <label className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer transition-colors w-full md:w-auto">
-          <Upload className="w-5 h-5" />
-          <span>Chọn file CSV để import</span>
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleImportRecommendations}
-            disabled={loading}
-            className="hidden"
-          />
-        </label>
+        <button
+          onClick={handleImportRecommendations}
+          disabled={loading}
+          className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors w-full md:w-auto"
+        >
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Upload className="w-5 h-5" />
+          )}
+          <span>Import từ CSV</span>
+        </button>
 
-        {loading && (
-          <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Đang import...</span>
-          </div>
-        )}
+        <p className="mt-2 text-xs text-gray-500">
+          File: imports/recommendations.csv
+        </p>
       </div>
     </div>
   );
 }
-

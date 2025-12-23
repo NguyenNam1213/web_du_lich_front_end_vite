@@ -5,7 +5,7 @@ import { useUser } from "../../context/UserContext";
 import { updateProfile } from "../../api/user";
 
 const Profile = () => {
-  const { userData, setUserData } = useUser();
+  const { userData, fetchProfile } = useUser();
   const [edit, setEdit] = useState(false);
   const [formData, setFormData] = useState({
     firstName: userData.firstName || "",
@@ -16,17 +16,14 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      const res = await updateProfile(
+      await updateProfile(
         formData.firstName,
         formData.lastName,
         formData.phone
       );
-      setUserData((prev) => ({
-        ...prev,
-        firstName: res.data.firstName,
-        lastName: res.data.lastName,
-        phone: res.data.phone,
-      }));
+
+      await fetchProfile(); 
+
       alert("Cập nhật thông tin thành công!");
       setEdit(false);
     } catch (err) {
@@ -34,6 +31,7 @@ const Profile = () => {
       alert("Cập nhật thất bại, vui lòng thử lại!");
     }
   };
+
 
   return (
     <div className="profile-container">

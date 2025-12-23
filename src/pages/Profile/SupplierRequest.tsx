@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SupplierRequest.css";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 import {
@@ -7,6 +7,12 @@ import {
   CreateSupplierRequestDto,
 } from "../../api/supplierRequest.service";
 import { toastService } from "../../utils/toast";
+import { DestinationService } from "../../api/destination.service";
+import { getCountries } from "../../services/api/countryApi";
+import { getCities } from "../../services/api/cityApi";
+import { Country } from "../../layouts/admin/types/country.type";
+import { City } from "../../layouts/admin/types/city.type";
+import imageCompression from "browser-image-compression";
 
 const SupplierRequest = () => {
   const [requestType, setRequestType] = useState<RequestType>(
@@ -34,6 +40,59 @@ const SupplierRequest = () => {
     imageUrl: "",
     description: "",
   });
+
+  // Image upload states for destination
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [compressing, setCompressing] = useState(false);
+
+  // States for countries and cities
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loadingCountries, setLoadingCountries] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+
+  // Load countries when component mounts or when requestType changes to ADD_CITY
+  useEffect(() => {
+    if (requestType === RequestType.ADD_CITY) {
+      loadCountries();
+    }
+  }, [requestType]);
+
+  // Load cities when component mounts or when requestType changes to ADD_DESTINATION
+  useEffect(() => {
+    if (requestType === RequestType.ADD_DESTINATION) {
+      loadCities();
+    }
+  }, [requestType]);
+
+  const loadCountries = async () => {
+    try {
+      setLoadingCountries(true);
+      const data = await getCountries();
+      setCountries(data);
+    } catch (error) {
+      console.error("Error loading countries:", error);
+      toastService.error("Không thể tải danh sách quốc gia");
+    } finally {
+      setLoadingCountries(false);
+    }
+  };
+
+  const loadCities = async () => {
+    try {
+      setLoadingCities(true);
+      const data = await getCities();
+      setCities(data);
+    } catch (error) {
+      console.error("Error loading cities:", error);
+      toastService.error("Không thể tải danh sách thành phố");
+    } finally {
+      setLoadingCities(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,6 +177,10 @@ const SupplierRequest = () => {
           imageUrl: "",
           description: "",
         });
+        // Reset image upload states
+        setSelectedFile(null);
+        setPreviewUrl("");
+        setUploadProgress(0);
       }
     } catch (error: any) {
       toastService.error(
@@ -127,6 +190,100 @@ const SupplierRequest = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle file selection for destination image
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toastService.error("Vui lòng chọn file ảnh");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toastService.error("Kích thước ảnh không được vượt quá 10MB");
+      return;
+    }
+
+    try {
+      setCompressing(true);
+
+      // Cấu hình nén ảnh
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: file.type,
+      };
+
+      const compressedFile = await imageCompression(file, options);
+      
+      setSelectedFile(compressedFile);
+      
+      // Tạo preview URL từ file đã nén
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (error) {
+      console.error("Lỗi nén ảnh:", error);
+      toastService.error("Không thể xử lý ảnh. Vui lòng thử ảnh khác.");
+    } finally {
+      setCompressing(false);
+    }
+  };
+
+  // Upload image to server
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    try {
+      setUploading(true);
+      setUploadProgress(0);
+      
+      const res = await DestinationService.uploadImage(
+        selectedFile,
+        (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 100)
+          );
+          setUploadProgress(percentCompleted);
+        }
+      );
+      
+      const uploadedUrl = res.data.url;
+      setLocationData({
+        ...locationData,
+        imageUrl: uploadedUrl,
+      });
+      setPreviewUrl(uploadedUrl);
+      
+      toastService.success("✅ Tải ảnh lên thành công!");
+    } catch (err: any) {
+      console.error(err);
+      
+      // Xử lý các loại lỗi khác nhau
+      if (err.code === 'ECONNABORTED') {
+        toastService.error(
+          "⏱️ Upload quá lâu (>30s). Vui lòng:\n" +
+          "1. Chọn ảnh có kích thước nhỏ hơn\n" +
+          "2. Kiểm tra kết nối mạng\n" +
+          "3. Thử lại sau"
+        );
+      } else if (err.response?.status === 413) {
+        toastService.error("❌ File quá lớn. Vui lòng chọn ảnh nhỏ hơn.");
+      } else if (err.response?.status === 500) {
+        toastService.error("❌ Lỗi server. Vui lòng liên hệ quản trị viên.");
+      } else {
+        toastService.error("❌ Tải ảnh lên thất bại. Vui lòng thử lại.");
+      }
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -318,21 +475,29 @@ const SupplierRequest = () => {
               </div>
 
               <div className="form-group">
-                <label>Mã quốc gia *</label>
-                <input
-                  type="text"
-                  value={locationData.countryCode}
-                  onChange={(e) =>
-                    setLocationData({
-                      ...locationData,
-                      countryCode: e.target.value.toUpperCase(),
-                    })
-                  }
-                  className="form-input"
-                  required
-                  maxLength={2}
-                  placeholder="TH"
-                />
+                <label>Quốc gia *</label>
+                {loadingCountries ? (
+                  <p>Đang tải danh sách quốc gia...</p>
+                ) : (
+                  <select
+                    value={locationData.countryCode}
+                    onChange={(e) =>
+                      setLocationData({
+                        ...locationData,
+                        countryCode: e.target.value,
+                      })
+                    }
+                    className="form-select"
+                    required
+                  >
+                    <option value="">-- Chọn quốc gia --</option>
+                    {countries.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name} ({country.code})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </>
           )}
@@ -358,20 +523,29 @@ const SupplierRequest = () => {
               </div>
 
               <div className="form-group">
-                <label>City ID *</label>
-                <input
-                  type="number"
-                  value={locationData.cityId}
-                  onChange={(e) =>
-                    setLocationData({
-                      ...locationData,
-                      cityId: e.target.value,
-                    })
-                  }
-                  className="form-input"
-                  required
-                  placeholder="123"
-                />
+                <label>Thành phố *</label>
+                {loadingCities ? (
+                  <p>Đang tải danh sách thành phố...</p>
+                ) : (
+                  <select
+                    value={locationData.cityId}
+                    onChange={(e) =>
+                      setLocationData({
+                        ...locationData,
+                        cityId: e.target.value,
+                      })
+                    }
+                    className="form-select"
+                    required
+                  >
+                    <option value="">-- Chọn thành phố --</option>
+                    {cities.map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {city.name} {city.country && `(${city.country.name})`}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div className="form-group">
@@ -391,19 +565,88 @@ const SupplierRequest = () => {
               </div>
 
               <div className="form-group">
-                <label>Image URL</label>
-                <input
-                  type="url"
-                  value={locationData.imageUrl}
-                  onChange={(e) =>
-                    setLocationData({
-                      ...locationData,
-                      imageUrl: e.target.value,
-                    })
-                  }
-                  className="form-input"
-                  placeholder="https://..."
-                />
+                <label>Ảnh điểm đến</label>
+                <div style={{ marginBottom: "10px" }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    disabled={compressing || uploading}
+                    style={{ marginBottom: "10px" }}
+                  />
+                  {compressing && <p>Đang nén ảnh...</p>}
+                  {selectedFile && !uploading && (
+                    <button
+                      type="button"
+                      onClick={handleUpload}
+                      disabled={uploading}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#1890ff",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      {uploading ? "Đang tải lên..." : "Tải ảnh lên"}
+                    </button>
+                  )}
+                  {uploading && (
+                    <div style={{ marginTop: "10px" }}>
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "20px",
+                          backgroundColor: "#f0f0f0",
+                          borderRadius: "10px",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${uploadProgress}%`,
+                            height: "100%",
+                            backgroundColor: "#1890ff",
+                            transition: "width 0.3s",
+                          }}
+                        />
+                      </div>
+                      <p style={{ marginTop: "5px", fontSize: "12px" }}>
+                        {uploadProgress}%
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {previewUrl && (
+                  <div style={{ marginTop: "10px" }}>
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      style={{
+                        maxWidth: "300px",
+                        maxHeight: "200px",
+                        borderRadius: "4px",
+                        border: "1px solid #ddd",
+                      }}
+                    />
+                  </div>
+                )}
+                {locationData.imageUrl && !previewUrl && (
+                  <div style={{ marginTop: "10px" }}>
+                    <img
+                      src={locationData.imageUrl}
+                      alt="Current"
+                      style={{
+                        maxWidth: "300px",
+                        maxHeight: "200px",
+                        borderRadius: "4px",
+                        border: "1px solid #ddd",
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-group">

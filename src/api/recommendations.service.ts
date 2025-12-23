@@ -73,6 +73,14 @@ export const importRecommendationsFromCSV = async (
 };
 
 /**
+ * Import recommendations từ file mặc định (imports/recommendations.csv)
+ */
+export const importRecommendationsDefault = async (): Promise<ImportRecommendationsResponse> => {
+  const res = await api.post("/recommendations/import/default");
+  return res.data;
+};
+
+/**
  * Lấy recommendations cho user hiện tại
  */
 export const getRecommendations = async (
@@ -114,6 +122,17 @@ export const clearAllRecommendations = async (): Promise<{
   message: string;
 }> => {
   const res = await api.delete("/recommendations");
+  return res.data;
+};
+
+/**
+ * Lấy danh sách tours từ recommendations cho current user
+ */
+export const getRecommendedTours = async (
+  topN?: number
+): Promise<{ success: boolean; userId: number; tours: any[]; count: number }> => {
+  const params = topN ? `?topN=${topN}` : "";
+  const res = await api.get(`/recommendations/tours${params}`);
   return res.data;
 };
 

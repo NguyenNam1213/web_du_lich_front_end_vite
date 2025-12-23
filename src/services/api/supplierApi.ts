@@ -9,8 +9,20 @@ const api = axios.create({
   },
 });
 
-export const getSuppliers = async (): Promise<Supplier[]> => {
-  const response = await api.get<Supplier[]>("/suppliers");
+export const getSuppliers = async (page: number = 1, limit: number = 10): Promise<{
+  suppliers: Supplier[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+}> => {
+  const response = await api.get<{
+    suppliers: Supplier[];
+    total: number;
+    totalPages: number;
+    currentPage: number;
+  }>("/suppliers", {
+    params: { page, limit },
+  });
   return response.data;
 };
 

@@ -35,4 +35,9 @@ export interface Activity {
   bookings?: Booking[];
   reviews?: Review[];
   wishlists?: Wishlist[];
+  _count?: {
+    bookings?: number;
+    reviews?: number;
+    wishlists?: number;
+  };
 }

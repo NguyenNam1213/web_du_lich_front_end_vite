@@ -23,5 +23,8 @@ export interface SupplierState {
   suppliers: Supplier[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  total?: number;
+  totalPages?: number;
+  currentPage?: number;
 }
 

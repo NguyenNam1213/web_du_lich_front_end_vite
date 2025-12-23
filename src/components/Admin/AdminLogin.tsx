@@ -64,7 +64,6 @@ const AdminLogin = () => {
           if (user && user.role && user.role.toLowerCase() === "admin") {
             // Lưu thông tin user vào localStorage
             localStorage.setItem("user", JSON.stringify(user));
-            alert("Đăng nhập admin thành công!");
             navigate("/admin/dashboard");
           } else {
             // Nếu không phải admin, xóa token và thông báo
@@ -159,7 +158,7 @@ const AdminLogin = () => {
               textDecoration: "underline"
             }}
           >
-            Quay lại trang đăng nhập thường
+            Quay lại trang đăng nhập người dùng
           </span>
         </div>
       </div>

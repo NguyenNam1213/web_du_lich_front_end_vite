@@ -39,4 +39,16 @@ export const ActivityService = {
   });
 },
 
+  // Admin only - Get all activities with pagination
+  getAllForAdmin(page: number = 1, limit: number = 10): Promise<AxiosResponse<{
+    activities: Activity[];
+    total: number;
+    totalPages: number;
+    currentPage: number;
+  }>> {
+    return instance.get('/tours/activity/admin/all', {
+      params: { page, limit },
+    });
+  },
+
 };

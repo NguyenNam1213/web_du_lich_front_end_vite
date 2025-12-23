@@ -4,6 +4,7 @@ import { LogOut, User, Settings, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { userMenuItems } from "../constants/nav-items";
+import defaultAvatar from "../../../assets/avatar/default-avatar.svg";
 
 interface UserMenuProps {
   isOpen: boolean;
@@ -14,11 +15,13 @@ interface UserInfo {
   firstName?: string;
   lastName?: string;
   email?: string;
+  avatar?: string;
 }
 
 export function UserMenu({ isOpen, onClose }: UserMenuProps) {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userAvatar, setUserAvatar] = useState<string>(defaultAvatar);
 
   useEffect(() => {
     // Lấy thông tin user từ localStorage
@@ -30,9 +33,17 @@ export function UserMenu({ isOpen, onClose }: UserMenuProps) {
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           email: user.email || "",
+          avatar: user.avatar || "",
         });
+        // Set avatar, nếu không có thì dùng default
+        if (user.avatar && user.avatar.trim() !== "") {
+          setUserAvatar(user.avatar);
+        } else {
+          setUserAvatar(defaultAvatar);
+        }
       } catch (error) {
         console.error("Lỗi khi parse user info:", error);
+        setUserAvatar(defaultAvatar);
       }
     }
   }, [isOpen]); // Reload khi menu mở
@@ -59,12 +70,25 @@ export function UserMenu({ isOpen, onClose }: UserMenuProps) {
   return (
     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-          {displayName}
-        </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          {displayEmail}
-        </p>
+        <div className="flex items-center gap-3 mb-2">
+          <img
+            src={userAvatar}
+            alt="User Avatar"
+            className="w-10 h-10 rounded-full object-cover"
+            onError={(e) => {
+              // Nếu ảnh lỗi, dùng default avatar
+              e.currentTarget.src = defaultAvatar;
+            }}
+          />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+              {displayName}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {displayEmail}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="py-2">

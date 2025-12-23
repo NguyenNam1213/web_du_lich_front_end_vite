@@ -169,7 +169,11 @@ export default function NotificationList() {
       </ul>
 
       <div className="p-3 border-t">
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
     </div>
   );

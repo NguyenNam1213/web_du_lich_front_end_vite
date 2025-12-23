@@ -11,6 +11,7 @@ import { CheckCircle2, XCircle, Trash2, Eye, X } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toastService } from "../../../utils/toast";
+import Pagination from "../components/pagination";
 
 export default function SupplierRequestManagerTable() {
   const [requests, setRequests] = useState<SupplierRequest[]>([]);
@@ -25,17 +26,30 @@ export default function SupplierRequestManagerTable() {
     type?: RequestType;
     status?: RequestStatus;
   }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     fetchRequests();
+    setCurrentPage(1); // Reset to first page when filters change
   }, [filters]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [currentPage]);
 
   const fetchRequests = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await SupplierRequestService.getAll(filters);
-      setRequests(response.data);
+      const response = await SupplierRequestService.getAll({
+        ...filters,
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+      });
+      setRequests(response.data.requests);
+      setTotalPages(response.data.totalPages);
     } catch (err: any) {
       setError(err.response?.data?.message || "Không thể tải danh sách requests");
       console.error("Error fetching requests:", err);
@@ -133,6 +147,7 @@ export default function SupplierRequestManagerTable() {
       </span>
     );
   };
+
 
   return (
     <>
@@ -260,6 +275,17 @@ export default function SupplierRequestManagerTable() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+          }}
+        />
+      )}
 
       {/* Detail Modal */}
       <Transition appear show={isDetailModalOpen} as={Fragment}>
