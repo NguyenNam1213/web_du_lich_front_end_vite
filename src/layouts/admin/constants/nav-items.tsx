@@ -88,6 +88,16 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
     href: "/admin/destinations",
     icon: <MapPin className="text-gray-700 w-5 h-5" />,
   },
+  {
+    label: "Activity",
+    href: "/admin/activities",
+    icon: <Film className="text-gray-700 w-5 h-5" />,
+  },
+  {
+    label: "Reviews",
+    href: "/admin/reviews",
+    icon: <Star className="text-gray-700 w-5 h-5" />,
+  },
   // {
   //   label: "Report Bug",
   //   href: "/admin/bug",
@@ -95,12 +105,7 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
   // },
 
   {
-    label: "Ratings & Recommendations",
-    href: "/admin/ratings",
-    icon: <Star className="text-gray-700 w-5 h-5" />,
-  },
-  {
-    label: "Scheduler",
+    label: "Recommendation Quản Lý",
     href: "/admin/scheduler",
     icon: <Clock className="text-gray-700 w-5 h-5" />,
   },

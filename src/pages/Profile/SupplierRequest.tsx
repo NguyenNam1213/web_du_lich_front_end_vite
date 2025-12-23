@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SupplierRequest.css";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 import {
@@ -8,6 +8,10 @@ import {
 } from "../../api/supplierRequest.service";
 import { toastService } from "../../utils/toast";
 import { DestinationService } from "../../api/destination.service";
+import { getCountries } from "../../services/api/countryApi";
+import { getCities } from "../../services/api/cityApi";
+import { Country } from "../../layouts/admin/types/country.type";
+import { City } from "../../layouts/admin/types/city.type";
 import imageCompression from "browser-image-compression";
 
 const SupplierRequest = () => {
@@ -43,6 +47,52 @@ const SupplierRequest = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [compressing, setCompressing] = useState(false);
+
+  // States for countries and cities
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loadingCountries, setLoadingCountries] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+
+  // Load countries when component mounts or when requestType changes to ADD_CITY
+  useEffect(() => {
+    if (requestType === RequestType.ADD_CITY) {
+      loadCountries();
+    }
+  }, [requestType]);
+
+  // Load cities when component mounts or when requestType changes to ADD_DESTINATION
+  useEffect(() => {
+    if (requestType === RequestType.ADD_DESTINATION) {
+      loadCities();
+    }
+  }, [requestType]);
+
+  const loadCountries = async () => {
+    try {
+      setLoadingCountries(true);
+      const data = await getCountries();
+      setCountries(data);
+    } catch (error) {
+      console.error("Error loading countries:", error);
+      toastService.error("Không thể tải danh sách quốc gia");
+    } finally {
+      setLoadingCountries(false);
+    }
+  };
+
+  const loadCities = async () => {
+    try {
+      setLoadingCities(true);
+      const data = await getCities();
+      setCities(data);
+    } catch (error) {
+      console.error("Error loading cities:", error);
+      toastService.error("Không thể tải danh sách thành phố");
+    } finally {
+      setLoadingCities(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -425,21 +475,29 @@ const SupplierRequest = () => {
               </div>
 
               <div className="form-group">
-                <label>Mã quốc gia *</label>
-                <input
-                  type="text"
-                  value={locationData.countryCode}
-                  onChange={(e) =>
-                    setLocationData({
-                      ...locationData,
-                      countryCode: e.target.value.toUpperCase(),
-                    })
-                  }
-                  className="form-input"
-                  required
-                  maxLength={2}
-                  placeholder="TH"
-                />
+                <label>Quốc gia *</label>
+                {loadingCountries ? (
+                  <p>Đang tải danh sách quốc gia...</p>
+                ) : (
+                  <select
+                    value={locationData.countryCode}
+                    onChange={(e) =>
+                      setLocationData({
+                        ...locationData,
+                        countryCode: e.target.value,
+                      })
+                    }
+                    className="form-select"
+                    required
+                  >
+                    <option value="">-- Chọn quốc gia --</option>
+                    {countries.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name} ({country.code})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </>
           )}
@@ -465,20 +523,29 @@ const SupplierRequest = () => {
               </div>
 
               <div className="form-group">
-                <label>City ID *</label>
-                <input
-                  type="number"
-                  value={locationData.cityId}
-                  onChange={(e) =>
-                    setLocationData({
-                      ...locationData,
-                      cityId: e.target.value,
-                    })
-                  }
-                  className="form-input"
-                  required
-                  placeholder="123"
-                />
+                <label>Thành phố *</label>
+                {loadingCities ? (
+                  <p>Đang tải danh sách thành phố...</p>
+                ) : (
+                  <select
+                    value={locationData.cityId}
+                    onChange={(e) =>
+                      setLocationData({
+                        ...locationData,
+                        cityId: e.target.value,
+                      })
+                    }
+                    className="form-select"
+                    required
+                  >
+                    <option value="">-- Chọn thành phố --</option>
+                    {cities.map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {city.name} {city.country && `(${city.country.name})`}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div className="form-group">

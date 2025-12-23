@@ -10,8 +10,19 @@ export interface Review {
 
   user?: {
     id: number;
+    firstName?: string;
     lastName?: string;
+    email?: string;
     avatar?: string | null;
+  };
+  activity?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  booking?: {
+    id: number;
+    bookingRef: string;
   };
 }
 

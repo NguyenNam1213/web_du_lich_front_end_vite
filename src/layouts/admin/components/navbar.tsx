@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell, Menu } from "lucide-react";
 import { UserMenu } from "./user-menu";
+import defaultAvatar from "../../../assets/avatar/default-avatar.svg";
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -11,6 +12,25 @@ interface NavbarProps {
 
 export function Navbar({ onMenuToggle, hasUnread = false }: NavbarProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [userAvatar, setUserAvatar] = useState<string>(defaultAvatar);
+
+  useEffect(() => {
+    // Lấy avatar từ user info trong localStorage
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.avatar && user.avatar.trim() !== "") {
+          setUserAvatar(user.avatar);
+        } else {
+          setUserAvatar(defaultAvatar);
+        }
+      } catch (error) {
+        console.error("Lỗi khi parse user info:", error);
+        setUserAvatar(defaultAvatar);
+      }
+    }
+  }, []);
 
   return (
     <nav className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
@@ -41,9 +61,15 @@ export function Navbar({ onMenuToggle, hasUnread = false }: NavbarProps) {
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-semibold">A</span>
-              </div>
+              <img
+                src={userAvatar}
+                alt="User Avatar"
+                className="w-8 h-8 rounded-full object-cover"
+                onError={(e) => {
+                  // Nếu ảnh lỗi, dùng default avatar
+                  e.currentTarget.src = defaultAvatar;
+                }}
+              />
             </button>
             <UserMenu
               isOpen={isUserMenuOpen}

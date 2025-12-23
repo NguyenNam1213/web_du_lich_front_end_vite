@@ -21,6 +21,8 @@ import DashboardPage from "../layouts/admin/pages/dashboard";
 import ManageCity from "../layouts/admin/pages/manage-city";
 import ManageCountry from "../layouts/admin/pages/manage-country";
 import ManageDestination from "../layouts/admin/pages/manage-destination";
+import ManageActivity from "../layouts/admin/pages/manage-activity";
+import ManageReview from "../layouts/admin/pages/manage-review";
 import ManageNotification from "../layouts/admin/pages/manage-notification";
 import ManageSupplier from "../layouts/admin/pages/manage-supplier";
 import ManageRequestSupplier from "../layouts/admin/pages/manage-request-supplier";
@@ -132,6 +134,8 @@ const AppRoutes = () => (
       <Route path="country" element={<ManageCountry />} />
       <Route path="city" element={<ManageCity />} />
       <Route path="destinations" element={<ManageDestination />} />
+      <Route path="activities" element={<ManageActivity />} />
+      <Route path="reviews" element={<ManageReview />} />
       <Route path="notification" element={<ManageNotification />} />
       <Route path="ratings" element={<ManageRatings />} />
       <Route path="transactions" element={<ManageTransactions />} />

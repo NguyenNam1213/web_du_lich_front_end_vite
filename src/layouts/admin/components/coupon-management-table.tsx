@@ -6,10 +6,14 @@ import { Trash2, Edit2, X, Plus } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toastService } from "../../../utils/toast";
+import Pagination from "../components/pagination";
 
 export default function CouponManagementTable() {
   const [coupons, setCoupons] = useState<CouponAdmin[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingCouponCode, setDeletingCouponCode] = useState<string | null>(null);
@@ -30,13 +34,14 @@ export default function CouponManagementTable() {
 
   useEffect(() => {
     fetchCoupons();
-  }, []);
+  }, [currentPage]);
 
   const fetchCoupons = async () => {
     try {
       setLoading(true);
-      const res = await CouponService.list();
-      setCoupons(res.data);
+      const res = await CouponService.list(undefined, currentPage, ITEMS_PER_PAGE);
+      setCoupons(res.data.coupons);
+      setTotalPages(res.data.totalPages);
     } catch (error: any) {
       toastService.error("Lỗi khi tải danh sách coupon!");
       console.error("Error fetching coupons:", error);
@@ -258,6 +263,17 @@ export default function CouponManagementTable() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+          }}
+        />
+      )}
 
       {/* Modal tạo/chỉnh sửa coupon */}
       <Transition appear show={isModalOpen} as={Fragment}>

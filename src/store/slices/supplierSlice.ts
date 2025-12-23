@@ -7,10 +7,13 @@ import {
 } from "../../services/api/supplierApi";
 import { Supplier, SupplierState } from "../../layouts/admin/types/supplier.type";
 
-export const fetchSuppliers = createAsyncThunk<Supplier[]>(
+export const fetchSuppliers = createAsyncThunk<
+  { suppliers: Supplier[]; total: number; totalPages: number; currentPage: number },
+  { page?: number; limit?: number }
+>(
   "suppliers/fetchSuppliers",
-  async () => {
-    const response = await getSuppliers();
+  async ({ page = 1, limit = 10 }) => {
+    const response = await getSuppliers(page, limit);
     return response;
   }
 );
@@ -43,6 +46,9 @@ const initialState: SupplierState = {
   suppliers: [],
   status: "idle",
   error: null,
+  total: 0,
+  totalPages: 1,
+  currentPage: 1,
 };
 
 const supplierSlice = createSlice({
@@ -56,7 +62,10 @@ const supplierSlice = createSlice({
       })
       .addCase(fetchSuppliers.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.suppliers = action.payload;
+        state.suppliers = action.payload.suppliers;
+        state.total = action.payload.total;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchSuppliers.rejected, (state, action) => {
         state.status = "failed";

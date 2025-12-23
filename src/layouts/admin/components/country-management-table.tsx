@@ -15,6 +15,7 @@ import { Trash2, Edit2, X } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toastService } from "../../../utils/toast";
+import Pagination from "../components/pagination";
 
 export default function CountryManagementTable() {
   const dispatch = useDispatch<AppDispatch>();
@@ -173,35 +174,11 @@ export default function CountryManagementTable() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-6 space-x-2">
-          <button
-            onClick={() => dispatch(setCurrentPage(currentPage - 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            Trước
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => dispatch(setCurrentPage(page))}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                page === currentPage
-                  ? "bg-gray-600 text-white border-gray-600"
-                  : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-          <button
-            onClick={() => dispatch(setCurrentPage(currentPage + 1))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            Sau
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => dispatch(setCurrentPage(page))}
+        />
       )}
 
       {/* Modal chỉnh sửa/thêm country */}

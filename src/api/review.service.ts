@@ -28,3 +28,16 @@ export const deleteReview = async (id: number): Promise<Review> => {
   const res = await api.delete(`/reviews/${id}`);
   return res.data;
 };
+
+// Admin only - Get all reviews with pagination
+export const getAllReviews = async (page: number = 1, limit: number = 10): Promise<{
+  reviews: Review[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+}> => {
+  const res = await api.get('/reviews/admin/all', {
+    params: { page, limit },
+  });
+  return res.data;
+};

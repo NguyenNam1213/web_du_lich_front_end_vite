@@ -14,6 +14,7 @@ import { Trash2, Edit2, X } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toastService } from "../../../utils/toast";
+import Pagination from "../components/pagination";
 
 export default function SupplierManagementTable() {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,6 +22,8 @@ export default function SupplierManagementTable() {
     suppliers = [],
     status,
     error,
+    currentPage = 1,
+    totalPages = 1,
   } = useSelector((state: RootState) => state.suppliers || {});
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,12 +41,10 @@ export default function SupplierManagementTable() {
     null
   );
 
-  // Lấy danh sách suppliers khi component mount
+  // Lấy danh sách suppliers khi component mount hoặc page thay đổi
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchSuppliers());
-    }
-  }, [dispatch, status]);
+    dispatch(fetchSuppliers({ page: currentPage, limit: 10 }));
+  }, [dispatch, currentPage]);
 
   const handleEdit = (supplier: Supplier) => {
     setFormData({
@@ -97,7 +98,7 @@ export default function SupplierManagementTable() {
       });
       setEditingSupplierId(null);
       // Tải lại danh sách
-      dispatch(fetchSuppliers());
+      dispatch(fetchSuppliers({ page: currentPage, limit: 10 }));
     }
   };
 
@@ -111,7 +112,7 @@ export default function SupplierManagementTable() {
     
     try {
       await dispatch(deleteSupplierAsync(deletingSupplierId));
-      dispatch(fetchSuppliers());
+      dispatch(fetchSuppliers({ page: currentPage, limit: 10 }));
       toastService.success("Đã xóa supplier thành công!");
       setIsDeleteModalOpen(false);
       setDeletingSupplierId(null);
@@ -211,6 +212,15 @@ export default function SupplierManagementTable() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => dispatch(fetchSuppliers({ page, limit: 10 }))}
+        />
+      )}
 
       {/* Modal chỉnh sửa/thêm supplier */}
       <Transition appear show={isModalOpen} as={Fragment}>

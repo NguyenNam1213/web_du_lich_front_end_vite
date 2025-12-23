@@ -6,6 +6,12 @@ import {
   ScheduleConfig,
 } from "../../../api/scheduler.service";
 import {
+  exportRatingsToCSV,
+  exportActivitiesToCSV,
+  importRecommendationsDefault,
+  getRecommendationsStats,
+} from "../../../api/recommendations.service";
+import {
   Clock,
   Play,
   Save,
@@ -15,6 +21,10 @@ import {
   AlertCircle,
   Calendar,
   RefreshCw,
+  Download,
+  Upload,
+  FileText,
+  BarChart3,
 } from "lucide-react";
 
 type FrequencyType = "daily" | "weekly";
@@ -71,6 +81,10 @@ export default function ManageScheduler() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   const [enabled, setEnabled] = useState(false);
   const [frequency, setFrequency] = useState<FrequencyType>("daily");
@@ -80,6 +94,7 @@ export default function ManageScheduler() {
 
   useEffect(() => {
     loadData();
+    loadStats();
   }, []);
 
   const loadData = async () => {
@@ -187,6 +202,81 @@ export default function ManageScheduler() {
     return `Mỗi ${dayName} lúc ${timeStr}`;
   };
 
+  const loadStats = async () => {
+    try {
+      setStatsLoading(true);
+      const result = await getRecommendationsStats();
+      setStats(result.stats);
+    } catch (error) {
+      console.error("Error loading stats:", error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const handleExportRatings = async () => {
+    try {
+      setExportLoading(true);
+      setMessage(null);
+
+      const result = await exportRatingsToCSV();
+      const downloadUrl = `${import.meta.env.VITE_API_BASE_URL}/${result.filePath.replace(/\\/g, "/")}`;
+
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = "ratings.csv";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showMessage("success", `Đã xuất và tải ratings.csv thành công!`);
+    } catch (error: any) {
+      showMessage("error", error.response?.data?.message || "Lỗi khi xuất ratings CSV");
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportActivities = async () => {
+    try {
+      setExportLoading(true);
+      setMessage(null);
+
+      const result = await exportActivitiesToCSV();
+      const downloadUrl = `${import.meta.env.VITE_API_BASE_URL}/${result.filePath.replace(/\\/g, "/")}`;
+
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = "activities.csv";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showMessage("success", `Đã xuất và tải activities.csv thành công!`);
+    } catch (error: any) {
+      showMessage("error", error.response?.data?.message || "Lỗi khi xuất activities CSV");
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleImportRecommendations = async () => {
+    try {
+      setImportLoading(true);
+      setMessage(null);
+
+      const result = await importRecommendationsDefault();
+      showMessage("success", `Đã import ${result.imported} recommendations. ${result.errors > 0 ? `Có ${result.errors} lỗi.` : ""}`);
+      loadStats();
+    } catch (error: any) {
+      showMessage("error", error.response?.data?.message || "Lỗi khi import recommendations");
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -196,10 +286,10 @@ export default function ManageScheduler() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-6 flex items-center gap-2">
         <Clock className="w-6 h-6" />
-        Lịch chạy Recommendation
+        Recommendation Quản Lý
       </h1>
 
       {/* Message */}
@@ -414,6 +504,130 @@ export default function ManageScheduler() {
             Làm mới
           </button>
         </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="w-5 h-5 text-gray-700" />
+          <h2 className="text-xl font-semibold">Thống kê Recommendations</h2>
+        </div>
+
+        {statsLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+          </div>
+        ) : stats ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600">Tổng Recommendations</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {stats.totalRecommendations}
+              </p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600">Số Users</p>
+              <p className="text-2xl font-bold text-green-600">
+                {stats.uniqueUsers}
+              </p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600">Rating Trung bình</p>
+              <p className="text-2xl font-bold text-purple-600">
+                {stats.averagePredictedRating.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-500">Không có dữ liệu thống kê</p>
+        )}
+      </div>
+
+      {/* Export Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Download className="w-5 h-5 text-gray-700" />
+          <h2 className="text-xl font-semibold">Xuất dữ liệu CSV (Thủ công)</h2>
+        </div>
+
+        <p className="text-sm text-gray-600 mb-4">
+          Xuất dữ liệu để sử dụng với hệ thống recommendation Python
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Export Ratings */}
+          <button
+            onClick={handleExportRatings}
+            disabled={exportLoading}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            {exportLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <FileText className="w-5 h-5" />
+            )}
+            <span>Xuất Ratings CSV</span>
+          </button>
+
+          {/* Export Activities */}
+          <button
+            onClick={handleExportActivities}
+            disabled={exportLoading}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            {exportLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <FileText className="w-5 h-5" />
+            )}
+            <span>Xuất Activities CSV</span>
+          </button>
+        </div>
+
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm font-semibold mb-2">Hướng dẫn:</p>
+          <ol className="text-sm text-gray-600 list-decimal list-inside space-y-1">
+            <li>
+              Nhấn "Xuất Ratings CSV" để tải file ratings.csv (format ml-100k)
+            </li>
+            <li>
+              Nhấn "Xuất Activities CSV" để tải file activities.csv với category
+              features
+            </li>
+            <li>Copy 2 files vào folder rcm/implementation</li>
+            <li>Chạy Python script: python hybrid_cf_cb.py</li>
+            <li>Import file recommendations.csv kết quả vào hệ thống</li>
+          </ol>
+        </div>
+      </div>
+
+      {/* Import Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Upload className="w-5 h-5 text-gray-700" />
+          <h2 className="text-xl font-semibold">Import Recommendations</h2>
+        </div>
+
+        <p className="text-sm text-gray-600 mb-4">
+          Import file recommendations.csv từ Python script vào database
+        </p>
+
+        <button
+          onClick={handleImportRecommendations}
+          disabled={importLoading}
+          className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors w-full md:w-auto"
+        >
+          {importLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Upload className="w-5 h-5" />
+          )}
+          <span>Import từ CSV</span>
+        </button>
+
+        <p className="mt-2 text-xs text-gray-500">
+          File: imports/recommendations.csv
+        </p>
       </div>
 
       {/* Info Card */}

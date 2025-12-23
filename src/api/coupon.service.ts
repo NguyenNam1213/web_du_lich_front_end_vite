@@ -51,10 +51,18 @@ export const CouponService = {
     // API: GET /coupons/active
     return api.get<Coupon[]>("/coupons/active");
   },
-  // Admin APIs
-  list: (active?: boolean) => {
-    const params = active !== undefined ? `?active=${active}` : "";
-    return api.get<CouponAdmin[]>(`/coupons${params}`);
+  // Admin APIs with pagination
+  list: (active?: boolean, page?: number, limit?: number) => {
+    const params: any = {};
+    if (active !== undefined) params.active = String(active);
+    if (page !== undefined) params.page = page;
+    if (limit !== undefined) params.limit = limit;
+    return api.get<{
+      coupons: CouponAdmin[];
+      total: number;
+      totalPages: number;
+      currentPage: number;
+    }>(`/coupons`, { params });
   },
   create: (data: CreateCouponDto) => {
     return api.post<CouponAdmin>("/coupons", data);
