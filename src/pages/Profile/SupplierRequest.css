@@ -1,30 +1,29 @@
 .supplier-request-container {
   display: flex;
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 20px;
-  gap: 30px;
+  gap: 40px;
+  padding: 40px 80px;
+  background-color: #f9f9fb;
+  font-family: "Segoe UI", sans-serif;
 }
 
 .supplier-request-main {
   flex: 1;
   background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 30px 40px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .supplier-request-main h2 {
-  font-size: 24px;
+  color: #ff5b00;
   font-weight: 600;
   margin-bottom: 10px;
-  color: #333;
 }
 
 .desc {
   color: #666;
-  margin-bottom: 30px;
-  line-height: 1.6;
+  font-size: 14px;
+  margin-bottom: 25px;
 }
 
 .message {
@@ -67,8 +66,8 @@
 .form-input,
 .form-select,
 .form-textarea {
-  padding: 10px 12px;
-  border: 1px solid #ddd;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
@@ -79,8 +78,8 @@
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: #ff5b00;
+  box-shadow: 0 0 0 2px rgba(255, 91, 0, 0.1);
 }
 
 .form-textarea {
@@ -94,31 +93,31 @@
 }
 
 .submit-btn {
-  padding: 12px 24px;
-  background-color: #4a90e2;
+  background-color: #ff5b00;
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
-  font-weight: 500;
+  padding: 8px 16px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
+  font-size: 14px;
   margin-top: 10px;
 }
 
 .submit-btn:hover:not(:disabled) {
-  background-color: #357abd;
+  background-color: #e64a00;
 }
 
 .submit-btn:disabled {
-  background-color: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
   .supplier-request-container {
     flex-direction: column;
-    margin: 20px auto;
+    padding: 20px;
+    gap: 20px;
   }
 
   .supplier-request-main {
