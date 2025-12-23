@@ -35,6 +35,7 @@ import BookingHistory from "../pages/Profile/BookingHistory";
 import CouponsPage from "../pages/Profile/CouponsPage";
 import AdminLogin from "../components/Admin/AdminLogin";
 import AllToursPage from "../pages/Activity/AllToursPage";
+import AdminProtectedRoute from "../components/Admin/AdminProtectedRoute";
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
 
