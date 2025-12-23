@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { Calendar, Users, Check } from "lucide-react";
 import { Activity } from "../../types/activity";
 import { useNavigate } from "react-router-dom";
@@ -14,9 +14,12 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
   const [participants, setParticipants] = useState<number>(1);
   const [error, setError] = useState<string>("");
   const {userData} = useUser();
-  console.log("User Data in Booking Summary:", userData);
 
   const navigate = useNavigate();
+
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() + 2); 
+  const minDateStr = minDate.toISOString().split("T")[0];
 
   if (!tour)
     return (
@@ -30,6 +33,16 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
       setError("Vui lòng chọn ngày tham quan.");
       return;
     }
+
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+
+    if (selectedDate < today) {
+      setError("Không thể chọn ngày trong quá khứ.");
+      return;
+    }
+
     if(participants < 1) {
       setError("Số lượng người tham gia phải lớn hơn hoặc bằng 1.");
       return;
@@ -85,6 +98,7 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
         </label>
         <input
           type="date"
+          min={minDateStr}
           className="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={date}
           onChange={(e) => setDate(e.target.value)}
