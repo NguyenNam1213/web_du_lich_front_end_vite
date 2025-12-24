@@ -19,8 +19,14 @@ const Navbar = () => {
       }
 
       ActivityService.search(searchText)
-        .then((res) => setResults(res.data))
-        .catch(() => setResults([]));
+        .then((res) => {
+          console.log("Search response:", res.data);
+          setResults(res.data);
+        })
+        .catch((err) => {
+          console.error("Search error:", err);
+          setResults([]);
+        });
     }, 300);
 
     return () => clearTimeout(delay);

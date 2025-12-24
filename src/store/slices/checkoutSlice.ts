@@ -43,7 +43,7 @@ const checkoutSlice = createSlice({
     setDiscount: (state, action) => {
       state.discount = action.payload;
     },
-
+    
     resetCheckout: () => initialState,
   },
 });

@@ -73,25 +73,12 @@ const ProfileSidebar = () => {
       >
         Cài đặt tài khoản
       </button>
-
-      <div className="profile-level">
-        <p className="level-badge">Lv.1 Explorer</p>
-        <p className="level-text">4 benefits, 1X KlookCash</p>
-      </div>
-
       <div
         className="sidebar-section"
         onClick={() => navigate("/profile/coupons")}
       >
         <p>Mã giảm giá </p>
         <p>Xem</p>
-      </div>
-      <div className="sidebar-section">
-        <p>Xu</p>
-        <p>Xem</p>
-      </div>
-      <div className="sidebar-section" onClick={() => navigate("/gift-cards")}>
-        <p>Thẻ quà tặng</p>
       </div>
       <div className="sidebar-section" onClick={() => navigate("/profile")}>
         <p>Thông tin cá nhân</p>
