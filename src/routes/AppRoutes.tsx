@@ -31,6 +31,7 @@ import ManageRatings from "../layouts/admin/pages/manage-ratings";
 import ManageTransactions from "../layouts/admin/pages/manage-transactions";
 import ManageScheduler from "../layouts/admin/pages/manage-scheduler";
 import ManageCoupon from "../layouts/admin/pages/manage-coupon";
+import ManageBooking from "../layouts/admin/pages/manage-booking";
 import UserLayout from "../layouts/user/UserLayout";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
 import TourDetailPage from "../pages/TourDetail/TourDetailPage";
@@ -146,6 +147,7 @@ const AppRoutes = () => (
       <Route path="transactions" element={<ManageTransactions />} />
       <Route path="scheduler" element={<ManageScheduler />} />
       <Route path="coupon" element={<ManageCoupon />} />
+      <Route path="booking" element={<ManageBooking />} />
       <Route path="test" element={<Counter />} />
     </Route>
     <Route path="/*" element={<AllRouter />} />

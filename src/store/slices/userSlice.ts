@@ -56,7 +56,11 @@ const initialState: UserState = {
 const userSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUsers.pending, (state) => {
@@ -98,4 +102,5 @@ const userSlice = createSlice({
   },
 });
 
+export const { setCurrentPage } = userSlice.actions;
 export default userSlice.reducer;

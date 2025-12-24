@@ -12,6 +12,7 @@ import {
   CreditCard,
   Clock,
   Ticket,
+  Calendar,
 } from "lucide-react";
 import type React from "react";
 
@@ -92,6 +93,11 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
     label: "Activity",
     href: "/admin/activities",
     icon: <Film className="text-gray-700 w-5 h-5" />,
+  },
+  {
+    label: "Booking",
+    href: "/admin/booking",
+    icon: <Calendar className="text-gray-700 w-5 h-5" />,
   },
   {
     label: "Reviews",
