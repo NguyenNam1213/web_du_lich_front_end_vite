@@ -2,52 +2,60 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import paymentService from "../../api/payment.service";
-import BankTransferModal from "../Payment/BankTransferModal";
-import CreditCardModal from "../Payment/CreditCardModal";
-import PaypalModal from "../Payment/PaypalModal";
+import { useNavigate } from "react-router-dom";
 
 const SubmitOrderButton: React.FC = () => {
-  const checkout = useSelector((state: RootState) => state.checkout)
-
-  const [openBank, setOpenBank] = useState(false);
-  const [openCredit, setOpenCredit] = useState(false);
-  const [openPaypal, setOpenPaypal] = useState(false);
+  const checkout = useSelector((state: RootState) => state.checkout);
+  const navigate = useNavigate();
 
   const handlePay = async () => {
-    const { bookingId, method, amount, currency} = checkout;
+    const { bookingId, method, amount, currency, agreeTerms } = checkout;
+
     if (!bookingId || !method || !amount || !currency) {
       alert("Thiếu thông tin thanh toán. Vui lòng kiểm tra lại.");
       return;
-    };
+    }
+
+    if (!agreeTerms) {
+      alert("Vui lòng đồng ý với điều khoản trước khi thanh toán.");
+      return;
+    }
+
     const res = await paymentService.createPayment({
       bookingId,
       method,
       amount,
       currency,
-      status: "pending"
-    })
+      status: "pending",
+    });
 
-     if (checkout.method === "bank_transfer") {
-      setOpenBank(true);
+    if (method === "bank_transfer") {
+      navigate(`/checkout/${bookingId}/success`, {
+        state: {
+          bookingId,
+          paymentMethod: "bank_transfer",
+        },
+      });
     }
-    else if (checkout.method === "credit_card") {
-      setOpenCredit(true);
+
+    if (method === "cash") {
+      navigate(`/checkout/${bookingId}/success`, {
+        state: {
+          bookingId,
+          paymentMethod: "cash",
+        },
+      });
     }
-    else if (checkout.method === "paypal") {
-      setOpenPaypal(true);
-    }
-  }
+  };
+
   return (
     <>
-      <button 
+      <button
         className="w-full bg-rose-600 text-white py-3 px-4 rounded-xl font-semibold hover:bg-rose-700 transition"
         onClick={handlePay}
       >
         Tiến hành thanh toán
       </button>
-      <BankTransferModal isOpen={openBank} onClose={() => setOpenBank(false)} />
-      <CreditCardModal isOpen={openCredit} onClose={() => setOpenCredit(false)} />
-      <PaypalModal isOpen={openPaypal} onClose={() => setOpenPaypal(false)} />
     </>
   );
 };
