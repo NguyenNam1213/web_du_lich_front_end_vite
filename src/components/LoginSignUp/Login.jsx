@@ -1,16 +1,20 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import email_icon from "../../assets/email.png";
 import password_icon from "../../assets/password.png";
 import "./LoginSignUp.css";
 import { login } from "../../api/auth";
 import { useUser } from "../../context/UserContext";
+
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { fetchProfile } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const from = location.state?.from || "/";
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -26,7 +30,7 @@ const Login = () => {
         localStorage.setItem("access_token", res.data.access_token);
         await fetchProfile();
         alert("Đăng nhập thành công!");
-        navigate("/", {replace: true});
+        navigate(from, {replace: true});
       } else {
         alert("Không nhận được token từ máy chủ!");
       }

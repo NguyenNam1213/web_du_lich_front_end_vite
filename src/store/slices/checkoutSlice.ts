@@ -8,6 +8,13 @@ export interface CheckoutState {
   currency: string | null;
   couponCode: string | null;
   discount: number | null;
+  agreeTerms: boolean;
+
+  tourId?: number;
+  tourName?: string;
+  tourImage?: string;
+  bookingDate?: string;
+  participants?: number;
 }
 
 const initialState: CheckoutState = {
@@ -17,6 +24,7 @@ const initialState: CheckoutState = {
   currency: "VND",
   couponCode: null,
   discount: null,
+  agreeTerms: false,
 };
 
 const checkoutSlice = createSlice({
@@ -44,6 +52,26 @@ const checkoutSlice = createSlice({
       state.discount = action.payload;
     },
 
+    setTourId: (state, action) => {
+      state.tourId = action.payload;
+    },
+    setTourName: (state, action) => {
+      state.tourName = action.payload;
+    },
+    setTourImage: (state, action) => {
+      state.tourImage = action.payload; 
+    },
+    setBookingDate: (state, action) => {
+      state.bookingDate = action.payload;
+    },
+    setParticipants: (state, action) => {
+      state.participants = action.payload;
+    },
+
+    setAgreeTerms: (state, action: PayloadAction<boolean>) => {
+      state.agreeTerms = action.payload
+    },
+
     resetCheckout: () => initialState,
   },
 });
@@ -54,7 +82,13 @@ export const {
   setAmount,
   setCurrency,
   setCouponCode, 
-  setDiscount, 
+  setDiscount,
+  setTourId,
+  setTourName,
+  setTourImage,
+  setBookingDate,
+  setParticipants,
+  setAgreeTerms, 
   resetCheckout,
 } = checkoutSlice.actions;
 

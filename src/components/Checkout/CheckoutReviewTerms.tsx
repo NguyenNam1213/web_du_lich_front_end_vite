@@ -1,7 +1,13 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { setAgreeTerms } from "../../store/slices/checkoutSlice";
 
 const CheckoutReviewTerms: React.FC = () => {
-  const [agree, setAgree] = useState(false);
+  const dispatch = useDispatch();
+  const agree = useSelector(
+    (state: RootState) => state.checkout.agreeTerms
+  );
 
   return (
     <div>
@@ -11,7 +17,7 @@ const CheckoutReviewTerms: React.FC = () => {
         <input
           type="checkbox"
           checked={agree}
-          onChange={() => setAgree(!agree)}
+          onChange={(e) => dispatch(setAgreeTerms(e.target.checked))}
           className="mt-1"
         />
         <span className="text-gray-700 text-sm">

@@ -15,7 +15,6 @@ const initialState: TourState = {
   error: null,
 };
 
-// Async thunk để fetch tours
 export const fetchTours = createAsyncThunk(
   'tour/fetchTours',
   async (_, { rejectWithValue }) => {
@@ -32,16 +31,13 @@ const tourSlice = createSlice({
   name: 'tour',
   initialState,
   reducers: {
-    // Action để set tours trực tiếp (nếu cần)
     setTours: (state, action: PayloadAction<Activity[]>) => {
       state.tours = action.payload;
     },
-    // Action để clear tours
     clearTours: (state) => {
       state.tours = [];
       state.error = null;
     },
-    // Action để update một tour cụ thể
     updateTour: (state, action: PayloadAction<Activity>) => {
       const index = state.tours.findIndex(tour => tour.id === action.payload.id);
       if (index !== -1) {

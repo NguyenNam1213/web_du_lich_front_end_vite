@@ -36,6 +36,8 @@ import CouponsPage from "../pages/Profile/CouponsPage";
 import AdminLogin from "../components/Admin/AdminLogin";
 import AllToursPage from "../pages/Activity/AllToursPage";
 import AdminProtectedRoute from "../components/Admin/AdminProtectedRoute";
+import CheckoutSuccessPage from "../pages/Checkout/CheckoutSuccessPage";
+import UserProtectedRoute from "./ProtectedRoute";
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
 
@@ -59,7 +61,10 @@ const AppRoutes = () => (
       <Route path="/tours/:id" element={<TourDetailPage />} />
       <Route path="/tours/all" element={<AllToursPage />} />
       <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
-      <Route path="/checkout/:id" element={<CheckoutPage />} />
+      <Route element={<UserProtectedRoute />}>
+        <Route path="/checkout/:id" element={<CheckoutPage />} />
+        <Route path="/checkout/:id/success" element={<CheckoutSuccessPage />} />
+      </Route>
       <Route
         path="/profile"
         element={

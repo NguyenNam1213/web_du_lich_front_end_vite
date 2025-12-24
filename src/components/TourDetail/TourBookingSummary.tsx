@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Calendar, Users, Check } from "lucide-react";
 import { Activity } from "../../types/activity";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { BookingService } from "../../api/booking.service";
 import { useUser } from "../../context/UserContext";
+import { toast } from "react-toastify";
 
 interface TourBookingSummaryProps {
   tour?: Activity;
@@ -16,6 +17,7 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
   const {userData} = useUser();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 2); 
@@ -29,6 +31,16 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
     );
   
   const handleBooking = async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      toast.info("Vui lòng đăng nhập để tiếp tục đặt tour");
+      navigate("/login", {
+        state: { from: location.pathname },
+        replace: true,
+      });
+      return;
+    }
+
     if(!date) {
       setError("Vui lòng chọn ngày tham quan.");
       return;
