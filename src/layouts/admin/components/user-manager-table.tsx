@@ -7,10 +7,11 @@ import {
   createUserAsync,
   updateUserAsync,
   deleteUserAsync,
+  setCurrentPage,
 } from "../../../store/slices/userSlice";
 import { RootState, AppDispatch } from "../../../store/index";
 import { User } from "../../admin/types/user.type";
-import { Trash2, Edit2, X } from "lucide-react";
+import { Trash2, Edit2, X, Search } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Pagination from "../components/pagination";
@@ -65,6 +66,26 @@ export default function UserManagementTable() {
   });
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter users based on search term
+  const filteredUsers = users.filter((user) => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      user.email?.toLowerCase().includes(searchLower) ||
+      user.firstName?.toLowerCase().includes(searchLower) ||
+      user.lastName?.toLowerCase().includes(searchLower) ||
+      user.phone?.toLowerCase().includes(searchLower) ||
+      user.id?.toString().includes(searchLower)
+    );
+  });
+
+  const ITEMS_PER_PAGE = 10;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+  const totalFilteredPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
 
   // Lấy danh sách người dùng khi component mount
   useEffect(() => {
@@ -205,6 +226,36 @@ export default function UserManagementTable() {
 
   return (
     <>
+      {/* Search Section */}
+      <div className="mb-4 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="flex gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo email, tên, số điện thoại, ID..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                dispatch(setCurrentPage(1));
+              }}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {searchTerm && (
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                dispatch(setCurrentPage(1));
+              }}
+              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Xóa
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Hành động */}
       <div className="mb-4 flex gap-2">
         <button
@@ -255,7 +306,14 @@ export default function UserManagementTable() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user: User) => (
+            {paginatedUsers.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                  {searchTerm ? "Không tìm thấy kết quả" : "Không có người dùng nào"}
+                </td>
+              </tr>
+            ) : (
+              paginatedUsers.map((user: User) => (
               <tr
                 key={user.id}
                 className="border-b border-gray-200 hover:bg-gray-50"
@@ -300,13 +358,20 @@ export default function UserManagementTable() {
                   </button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Thanh phân trang */}
-      <Pagination currentPage={currentPage} totalPages={totalPages} />
+      <Pagination 
+        currentPage={currentPage} 
+        totalPages={searchTerm ? totalFilteredPages : totalPages}
+        onPageChange={(page) => {
+          dispatch(setCurrentPage(page));
+        }}
+      />
 
       {/* Modal chỉnh sửa/thêm người dùng */}
       <Transition appear show={isModalOpen} as={Fragment}>

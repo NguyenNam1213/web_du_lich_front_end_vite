@@ -1,6 +1,8 @@
 import React from "react";
 import { Calendar, Users } from "lucide-react";
 import { Activity } from "../../types/activity";
+import { useDispatch } from "react-redux";
+import { setBookingDate, setParticipants, setTourId, setTourImage, setTourName } from "../../store/slices/checkoutSlice";
 
 interface Props {
   tour: Activity;
@@ -9,6 +11,13 @@ interface Props {
 }
 
 const OrderSummaryCard: React.FC<Props> = ({ tour, date, participants }) => {
+  const dispatch = useDispatch();
+  dispatch(setTourId(tour.id));
+  dispatch(setTourName(tour.name));
+  dispatch(setTourImage(tour.images?.[0]?.imageUrl));
+  dispatch(setBookingDate(date));
+  dispatch(setParticipants(participants));
+
   return (
     <div>
       <h2 className="text-lg font-semibold mb-4">Tóm tắt đơn hàng</h2>

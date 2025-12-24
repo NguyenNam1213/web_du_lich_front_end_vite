@@ -1,5 +1,4 @@
 import { Booking } from "./booking";
-import { CartItem } from "./cartItem";
 import { Review } from "./review";
 import { SearchHistory } from "./searchHistory";
 import { Supplier } from "./supplier";
@@ -25,7 +24,6 @@ export interface User {
   bookings?: Booking[];
   reviews?: Review[];
   wishlists?: Wishlist[];
-  cartItems?: CartItem[];
   searchHistory?: SearchHistory[];
   userBehaviors?: UserBehavior[];
   notifications?: Notification[];

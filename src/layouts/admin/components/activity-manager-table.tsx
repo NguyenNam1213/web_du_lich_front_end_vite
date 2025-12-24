@@ -16,7 +16,26 @@ export default function ActivityManagementTable() {
   const [deletingActivityId, setDeletingActivityId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const ITEMS_PER_PAGE = 10;
+
+  // Filter activities based on search term
+  const filteredActivities = activities.filter((activity) => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      activity.name?.toLowerCase().includes(searchLower) ||
+      activity.slug?.toLowerCase().includes(searchLower) ||
+      activity.id?.toString().includes(searchLower) ||
+      activity.destination?.name?.toLowerCase().includes(searchLower) ||
+      activity.supplier?.companyName?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedActivities = filteredActivities.slice(startIndex, endIndex);
+  const totalFilteredPages = Math.ceil(filteredActivities.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
     loadActivities();
@@ -70,13 +89,34 @@ export default function ActivityManagementTable() {
 
   return (
     <>
-      <div className="mb-4">
-        <button
-          onClick={loadActivities}
-          className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
-        >
-          Làm mới
-        </button>
+      {/* Search Section */}
+      <div className="mb-4 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="flex gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên, slug, điểm đến, nhà cung cấp, ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Xóa
+            </button>
+          )}
+          <button
+            onClick={loadActivities}
+            className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            Làm mới
+          </button>
+        </div>
       </div>
 
       {loading && <p className="mb-4">Đang tải...</p>}
@@ -98,14 +138,14 @@ export default function ActivityManagementTable() {
               </tr>
             </thead>
             <tbody>
-              {activities.length === 0 ? (
+              {paginatedActivities.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
-                    Không có hoạt động nào
+                    {searchTerm ? "Không tìm thấy kết quả" : "Không có hoạt động nào"}
                   </td>
                 </tr>
               ) : (
-                activities.map((activity) => (
+                paginatedActivities.map((activity) => (
                   <tr
                     key={activity.id}
                     className="border-b border-gray-200 hover:bg-gray-50"
@@ -165,10 +205,10 @@ export default function ActivityManagementTable() {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {(searchTerm ? totalFilteredPages : totalPages) > 1 && (
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={searchTerm ? totalFilteredPages : totalPages}
           onPageChange={(page) => {
             setCurrentPage(page);
           }}

@@ -12,7 +12,7 @@ import {
 import { fetchCities } from "../../../store/slices/citySlice";
 import { RootState, AppDispatch } from "../../../store/index";
 import { Destination } from "../types/destination.type";
-import { Trash2, Edit2, X } from "lucide-react";
+import { Trash2, Edit2, X, Search } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toastService } from "../../../utils/toast";
@@ -31,9 +31,6 @@ export default function DestinationManagementTable() {
   const { cities = [] } = useSelector((state: RootState) => state.cities || {});
 
   const ITEMS_PER_PAGE = 10;
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedDestinations = destinations.slice(startIndex, endIndex);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -47,6 +44,24 @@ export default function DestinationManagementTable() {
   const [editingDestinationId, setEditingDestinationId] = useState<
     string | null
   >(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter destinations based on search term
+  const filteredDestinations = destinations.filter((destination) => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      destination.name?.toLowerCase().includes(searchLower) ||
+      destination.slug?.toLowerCase().includes(searchLower) ||
+      destination.id?.toString().includes(searchLower) ||
+      destination.city?.name?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedDestinations = filteredDestinations.slice(startIndex, endIndex);
+  const totalFilteredPages = Math.ceil(filteredDestinations.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
     if (status === "idle") {
@@ -126,6 +141,30 @@ export default function DestinationManagementTable() {
 
   return (
     <>
+      {/* Search Section */}
+      <div className="mb-4 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="flex gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên, slug, thành phố, ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Xóa
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Nút thêm destination */}
       <div className="mb-4">
         <button
@@ -162,7 +201,14 @@ export default function DestinationManagementTable() {
             </tr>
           </thead>
           <tbody>
-            {paginatedDestinations.map((destination: Destination) => (
+            {paginatedDestinations.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  {searchTerm ? "Không tìm thấy kết quả" : "Không có điểm đến nào"}
+                </td>
+              </tr>
+            ) : (
+              paginatedDestinations.map((destination: Destination) => (
               <tr
                 key={destination.id}
                 className="border-b border-gray-200 hover:bg-gray-50"
@@ -197,16 +243,17 @@ export default function DestinationManagementTable() {
                   </button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {(searchTerm ? totalFilteredPages : totalPages) > 1 && (
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={searchTerm ? totalFilteredPages : totalPages}
           onPageChange={(page) => dispatch(setCurrentPage(page))}
         />
       )}

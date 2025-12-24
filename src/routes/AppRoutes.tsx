@@ -31,6 +31,7 @@ import ManageRatings from "../layouts/admin/pages/manage-ratings";
 import ManageTransactions from "../layouts/admin/pages/manage-transactions";
 import ManageScheduler from "../layouts/admin/pages/manage-scheduler";
 import ManageCoupon from "../layouts/admin/pages/manage-coupon";
+import ManageBooking from "../layouts/admin/pages/manage-booking";
 import UserLayout from "../layouts/user/UserLayout";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
 import TourDetailPage from "../pages/TourDetail/TourDetailPage";
@@ -41,6 +42,8 @@ import CouponsPage from "../pages/Profile/CouponsPage";
 import AdminLogin from "../components/Admin/AdminLogin";
 import AllToursPage from "../pages/Activity/AllToursPage";
 import AdminProtectedRoute from "../components/Admin/AdminProtectedRoute";
+import CheckoutSuccessPage from "../pages/Checkout/CheckoutSuccessPage";
+import UserProtectedRoute from "./ProtectedRoute";
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
 
@@ -64,7 +67,10 @@ const AppRoutes = () => (
       <Route path="/tours/:id" element={<TourDetailPage />} />
       <Route path="/tours/all" element={<AllToursPage />} />
       <Route path="/tours/:id/reviews" element={<TourReviewPage />} />
-      <Route path="/checkout/:id" element={<CheckoutPage />} />
+      <Route element={<UserProtectedRoute />}>
+        <Route path="/checkout/:id" element={<CheckoutPage />} />
+        <Route path="/checkout/:id/success" element={<CheckoutSuccessPage />} />
+      </Route>
       <Route
         path="/profile"
         element={
@@ -141,6 +147,7 @@ const AppRoutes = () => (
       <Route path="transactions" element={<ManageTransactions />} />
       <Route path="scheduler" element={<ManageScheduler />} />
       <Route path="coupon" element={<ManageCoupon />} />
+      <Route path="booking" element={<ManageBooking />} />
       <Route path="test" element={<Counter />} />
     </Route>
     <Route path="/*" element={<AllRouter />} />

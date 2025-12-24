@@ -1,5 +1,5 @@
 
-export type PaymentMethod = "credit_card" | "paypal" | "bank_transfer";
+export type PaymentMethod = "cash" | "bank_transfer";
 export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
 
 export interface CreatePaymentDto {

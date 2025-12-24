@@ -11,7 +11,7 @@ import {
 } from "../../../store/slices/citySlice";
 import { RootState, AppDispatch } from "../../../store/index";
 import { City } from "../types/city.type";
-import { Trash2, Edit2, X } from "lucide-react";
+import { Trash2, Edit2, X, Search } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toastService } from "../../../utils/toast";
@@ -28,9 +28,6 @@ export default function CityManagementTable() {
   } = useSelector((state: RootState) => state.cities || {});
 
   const ITEMS_PER_PAGE = 10;
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedCities = cities.slice(startIndex, endIndex);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,6 +37,23 @@ export default function CityManagementTable() {
     countryCode: "",
   });
   const [editingCityId, setEditingCityId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter cities based on search term
+  const filteredCities = cities.filter((city) => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      city.name?.toLowerCase().includes(searchLower) ||
+      city.id?.toString().includes(searchLower) ||
+      city.countryCode?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedCities = filteredCities.slice(startIndex, endIndex);
+  const totalFilteredPages = Math.ceil(filteredCities.length / ITEMS_PER_PAGE);
 
   // Sample countries - in production, you'd fetch this from API
   const countries = [
@@ -109,6 +123,30 @@ export default function CityManagementTable() {
 
   return (
     <>
+      {/* Search Section */}
+      <div className="mb-4 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="flex gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên thành phố, mã quốc gia, ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Xóa
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Nút thêm city */}
       <div className="mb-4">
         <button
@@ -144,7 +182,14 @@ export default function CityManagementTable() {
             </tr>
           </thead>
           <tbody>
-            {paginatedCities.map((city: City) => (
+            {paginatedCities.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  {searchTerm ? "Không tìm thấy kết quả" : "Không có thành phố nào"}
+                </td>
+              </tr>
+            ) : (
+              paginatedCities.map((city: City) => (
               <tr
                 key={city.id}
                 className="border-b border-gray-200 hover:bg-gray-50"
@@ -174,16 +219,17 @@ export default function CityManagementTable() {
                   </button>
                 </td>
               </tr>
-            ))}
+            ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {(searchTerm ? totalFilteredPages : totalPages) > 1 && (
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={searchTerm ? totalFilteredPages : totalPages}
           onPageChange={(page) => dispatch(setCurrentPage(page))}
         />
       )}
