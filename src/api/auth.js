@@ -26,4 +26,12 @@ export const getProfile = () => {
   return api.get("/auth/profile");
 };
 
+export const forgotPassword = (email) => {
+  return api.post("/auth/forgot-password", { email });
+};
+
+export const resetPassword = (email, token, newPassword) => {
+  return api.post("/auth/reset-password", { email, token, newPassword });
+};
+
 export default api;

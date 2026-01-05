@@ -44,24 +44,22 @@ const ApplyCoupon: React.FC = () => {
   };
 
   const handleApply = async (couponCode = code) => {
-    if (!checkout.amount) {
-      setError("Không tìm thấy tổng tiền để áp dụng mã.");
+    const originalAmount = checkout.amount + (checkout.discount || 0);
+
+    if (!originalAmount || originalAmount <= 0) {
+      setError("Không tìm thấy tổng tiền hợp lệ để áp dụng mã.");
       return;
     }
 
     try {
       setLoading(true);
-      const res = await CouponService.apply(couponCode, checkout.amount);
-
+      const res = await CouponService.apply(couponCode, originalAmount);
       const discountValue = res.data.discount;
       const finalTotal = res.data.finalAmount;
-
       dispatch(setCouponCode(couponCode));
       dispatch(setDiscount(discountValue ?? 0));
-      dispatch(setAmount(finalTotal));
-
+      dispatch(setAmount(finalTotal)); 
       if (couponCode !== code) setCode(couponCode);
-
       setError("");
     } catch (err: any) {
       setError(
@@ -71,6 +69,7 @@ const ApplyCoupon: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div>

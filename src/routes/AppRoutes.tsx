@@ -43,6 +43,8 @@ import AdminLogin from "../components/Admin/AdminLogin";
 import AllToursPage from "../pages/Activity/AllToursPage";
 import AdminProtectedRoute from "../components/Admin/AdminProtectedRoute";
 import CheckoutSuccessPage from "../pages/Checkout/CheckoutSuccessPage";
+import ForgotPassword from "../components/LoginSignUp/ForgotPassword";
+import ResetPassword from "../components/LoginSignUp/ResetPassword";
 import UserProtectedRoute from "./ProtectedRoute";
 const ProtectedRoute = ({ children }) => {
   const { userData, loading } = useUser();
@@ -62,6 +64,8 @@ const AppRoutes = () => (
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
     <Route path="/login-success" element={<LoginSuccess />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
     <Route element={<UserLayout />}>
       <Route path="/" element={<Home />} />
       <Route path="/tours/:id" element={<TourDetailPage />} />
