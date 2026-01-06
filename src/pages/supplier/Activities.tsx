@@ -24,7 +24,6 @@ function Activities() {
       const res = await ActivityService.getAll();
       setActivities(res.data);
     } catch (err) {
-      console.error(err);
       setError("Không thể tải danh sách hoạt động");
     } finally {
       setLoading(false);
@@ -65,7 +64,6 @@ function Activities() {
       setShowDelete(false);
       fetchActivities();
     } catch (err) {
-      console.error(err);
       alert("Xóa hoạt động thất bại");
     }
   };
@@ -93,7 +91,7 @@ function Activities() {
 
       {/* Loading + Error */}
       {loading && <p className="text-gray-600">Đang tải dữ liệu...</p>}
-      {error && <p className="text-red-600">{error}</p>}
+      {/* {error && <p className="text-red-600">{error}</p>} */}
 
       {/* Bảng danh sách */}
       {!loading && activities.length > 0 && (
