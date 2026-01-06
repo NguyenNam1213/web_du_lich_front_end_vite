@@ -165,13 +165,13 @@ const SubNavbar = () => {
           )}
         </li>
 
-        <li className="text-gray-700 text-sm font-medium hover:text-orange-500">
+        {/* <li className="text-gray-700 text-sm font-medium hover:text-orange-500">
           Khám phá Travel
         </li>
 
         <li className="text-gray-700 text-sm font-medium hover:text-orange-500">
           Phiếu quà tặng Travel
-        </li>
+        </li> */}
       </ul>
     </div>
   );

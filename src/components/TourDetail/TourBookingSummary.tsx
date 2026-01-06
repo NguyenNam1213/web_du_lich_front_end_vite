@@ -5,6 +5,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { BookingService } from "../../api/booking.service";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 interface TourBookingSummaryProps {
   tour?: Activity;
@@ -15,6 +17,9 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
   const [participants, setParticipants] = useState<number>(1);
   const [error, setError] = useState<string>("");
   const {userData} = useUser();
+  const schedules = useSelector(
+    (state: RootState) => state.tourSchedules.rows
+  );
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,6 +27,11 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 2); 
   const minDateStr = minDate.toISOString().split("T")[0];
+
+  const matchedSchedule = schedules.find(
+    (s) => s.dateISO === date
+  );
+  const bookingStatus = matchedSchedule ? "confirmed" : "pending";
 
   if (!tour)
     return (
@@ -65,7 +75,10 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
       const payLoad = {
         activityId: Number(tour.id),
         supplierId: Number(tour.supplier?.id),
-        scheduleId: Number(tour.schedules?.[0]?.id || 1), 
+        // scheduleId: Number(tour.schedules?.[0]?.id || 1), 
+        scheduleId: matchedSchedule
+          ? Number(matchedSchedule.id)
+          : null,
 
         customerName: userData ? `${userData.firstName} ${userData.lastName}` : "Khách hàng", 
         customerEmail: userData.email,
@@ -78,6 +91,7 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
         discount: 0,
         total: tour.price * participants,
         currency: tour.currency,
+        bookingStatus,
       };
 
       const res = await BookingService.createBooking(payLoad);
@@ -116,6 +130,18 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
           onChange={(e) => setDate(e.target.value)}
         />
       </div>
+      {matchedSchedule && (
+        <p className="text-sm text-green-600 mt-2">
+          ✅ Ngày này có lịch khởi hành – xác nhận ngay
+        </p>
+      )}
+
+      {!matchedSchedule && date && (
+        <p className="text-sm text-yellow-600 mt-2">
+          ⏳ Ngày này chưa có lịch – chờ nhà cung cấp xác nhận
+        </p>
+      )}
+
 
       {/* Số lượng người */}
       <div className="mb-4">
