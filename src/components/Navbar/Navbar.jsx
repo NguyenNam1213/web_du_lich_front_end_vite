@@ -63,7 +63,7 @@ const Navbar = () => {
       </div>
 
       <ul className="nav-menu">
-        <li>
+        {/* <li>
           <a className="nav-link" href="/">
             Mở ứng dụng
           </a>
@@ -77,7 +77,7 @@ const Navbar = () => {
           <a className="nav-link" href="/">
             Trợ giúp
           </a>
-        </li>
+        </li> */}
 
         {userData ? (
           <li className="nav-user">

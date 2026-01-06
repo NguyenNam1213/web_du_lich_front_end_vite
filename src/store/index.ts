@@ -7,6 +7,7 @@ import destinationReducer from "./slices/destinationSlice";
 import supplierReducer from "./slices/supplierSlice";
 import checkoutReducer from "./slices/checkoutSlice";
 import tourReducer from "./slices/tourSlice";
+import tourScheduleReducer from "./slices/tourSchedulesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     suppliers: supplierReducer,
     checkout: checkoutReducer,
     tour: tourReducer,
+    tourSchedules: tourScheduleReducer,
   },
 });
 

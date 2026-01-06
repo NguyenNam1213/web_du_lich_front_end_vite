@@ -19,9 +19,9 @@ const CheckoutMain: React.FC = () => {
       </div> */}
 
       {/* Yêu cầu bổ sung */}
-      <div className="bg-white p-6 rounded-2xl shadow-md">
+      {/* <div className="bg-white p-6 rounded-2xl shadow-md">
         <CheckoutAdditionalRequest />
-      </div>
+      </div> */}
 
       {/* Phương thức thanh toán */}
       <div className="bg-white p-6 rounded-2xl shadow-md">
