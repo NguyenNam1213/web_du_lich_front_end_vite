@@ -75,10 +75,9 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
       const payLoad = {
         activityId: Number(tour.id),
         supplierId: Number(tour.supplier?.id),
-        // scheduleId: Number(tour.schedules?.[0]?.id || 1), 
         scheduleId: matchedSchedule
           ? Number(matchedSchedule.id)
-          : null,
+          : 1,
 
         customerName: userData ? `${userData.firstName} ${userData.lastName}` : "Khách hàng", 
         customerEmail: userData.email,

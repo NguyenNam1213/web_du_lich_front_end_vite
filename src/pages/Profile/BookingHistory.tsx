@@ -4,6 +4,7 @@ import { BookingService } from "../../api/booking.service";
 import { useNavigate } from "react-router-dom";
 import { ActivityImageService } from "../../api/activityImage.service";
 import { createReview, getReviewByBooking, updateReview, deleteReview } from "../../api/review.service";
+import Pagination from "../../components/Supplier/Pagination";
 
 const BookingHistory = () => {
   const [bookingList, setBookingList] = useState([]);
@@ -22,6 +23,15 @@ const BookingHistory = () => {
 
   const navigate = useNavigate();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  const totalPages = Math.ceil(bookingList.length / pageSize);
+  const paginatedBookingList = bookingList.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   const getStatusInVietnamese = (status) => {
     const statusMap = {
       'pending': 'Chờ xác nhận',
@@ -31,6 +41,10 @@ const BookingHistory = () => {
     };
     return statusMap[status.toLowerCase()] || status;
   };
+
+  useEffect(() => {
+      setCurrentPage(1);
+    }, [bookingList]);
 
   useEffect(() => {
     const fetchBooking = async() => {
@@ -218,7 +232,7 @@ const BookingHistory = () => {
               <p className="text-gray-500">Bạn chưa có lịch sử đặt tour nào.</p>
             )}
 
-            {bookingList.map((item) => {
+            {paginatedBookingList.map((item) => {
               const firstImage = item.activity?.images?.[0]?.imageUrl;
               const tourName = item.activity?.name;
               const bookingDate = new Date(item.bookingDate).toLocaleDateString("vi-VN");
@@ -306,6 +320,11 @@ const BookingHistory = () => {
               );
             })}
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
 
         {/* ======================= [THÊM] DIALOG REVIEW ======================= */}
