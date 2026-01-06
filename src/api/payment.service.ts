@@ -42,6 +42,7 @@ class PaymentService {
     updated: number;
     errors: number;
     details: Array<{ bookingId: string; status: string; message: string }>;
+    exportFileName?: string | null;
   }> {
     const formData = new FormData();
     formData.append("file", file);

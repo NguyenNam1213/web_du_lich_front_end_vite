@@ -50,7 +50,14 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => ({
 }));
 
 // Parse cron expression to get frequency, hour, minute, and day
-const parseCronExpression = (cron: string): { frequency: FrequencyType; hour: number; minute: number; dayOfWeek: number } => {
+const parseCronExpression = (
+  cron: string
+): {
+  frequency: FrequencyType;
+  hour: number;
+  minute: number;
+  dayOfWeek: number;
+} => {
   const parts = cron.split(" ");
   if (parts.length !== 5) {
     return { frequency: "daily", hour: 2, minute: 0, dayOfWeek: 0 };
@@ -65,7 +72,12 @@ const parseCronExpression = (cron: string): { frequency: FrequencyType; hour: nu
 };
 
 // Build cron expression from frequency, hour, minute, and day
-const buildCronExpression = (frequency: FrequencyType, hour: number, minute: number, dayOfWeek: number): string => {
+const buildCronExpression = (
+  frequency: FrequencyType,
+  hour: number,
+  minute: number,
+  dayOfWeek: number
+): string => {
   if (frequency === "daily") {
     return `${minute} ${hour} * * *`;
   }
@@ -112,7 +124,10 @@ export default function ManageScheduler() {
       setMinute(parsed.minute);
       setDayOfWeek(parsed.dayOfWeek);
     } catch (error: any) {
-      showMessage("error", error.response?.data?.message || "Lỗi khi tải cấu hình");
+      showMessage(
+        "error",
+        error.response?.data?.message || "Lỗi khi tải cấu hình"
+      );
     } finally {
       setLoading(false);
     }
@@ -126,19 +141,31 @@ export default function ManageScheduler() {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const cronExpression = buildCronExpression(frequency, hour, minute, dayOfWeek);
+      const cronExpression = buildCronExpression(
+        frequency,
+        hour,
+        minute,
+        dayOfWeek
+      );
       const res = await setScheduleConfig(cronExpression, enabled);
       setConfig(res.config);
       showMessage("success", res.message);
     } catch (error: any) {
-      showMessage("error", error.response?.data?.message || "Lỗi khi lưu cấu hình");
+      showMessage(
+        "error",
+        error.response?.data?.message || "Lỗi khi lưu cấu hình"
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const handleRunNow = async () => {
-    if (!confirm("Bạn có chắc muốn chạy pipeline ngay bây giờ? Quá trình này có thể mất vài phút.")) {
+    if (
+      !confirm(
+        "Bạn có chắc muốn chạy pipeline ngay bây giờ? Quá trình này có thể mất vài phút."
+      )
+    ) {
       return;
     }
 
@@ -146,7 +173,7 @@ export default function ManageScheduler() {
       setRunning(true);
       showMessage("success", "Đang chạy pipeline...");
       const res = await runPipelineManually();
-      
+
       if (res.success) {
         showMessage("success", res.message);
       } else {
@@ -156,7 +183,10 @@ export default function ManageScheduler() {
       // Reload config to get updated lastRun info
       await loadData();
     } catch (error: any) {
-      showMessage("error", error.response?.data?.message || "Lỗi khi chạy pipeline");
+      showMessage(
+        "error",
+        error.response?.data?.message || "Lỗi khi chạy pipeline"
+      );
     } finally {
       setRunning(false);
     }
@@ -194,11 +224,14 @@ export default function ManageScheduler() {
   };
 
   const getScheduleDescription = () => {
-    const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+    const timeStr = `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
     if (frequency === "daily") {
       return `Mỗi ngày lúc ${timeStr}`;
     }
-    const dayName = DAYS_OF_WEEK.find(d => d.value === dayOfWeek)?.label || "";
+    const dayName =
+      DAYS_OF_WEEK.find((d) => d.value === dayOfWeek)?.label || "";
     return `Mỗi ${dayName} lúc ${timeStr}`;
   };
 
@@ -220,7 +253,9 @@ export default function ManageScheduler() {
       setMessage(null);
 
       const result = await exportRatingsToCSV();
-      const downloadUrl = `${import.meta.env.VITE_API_BASE_URL}/${result.filePath.replace(/\\/g, "/")}`;
+      const downloadUrl = `${
+        import.meta.env.VITE_API_BASE_URL
+      }/${result.filePath.replace(/\\/g, "/")}`;
 
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -232,7 +267,10 @@ export default function ManageScheduler() {
 
       showMessage("success", `Đã xuất và tải ratings.csv thành công!`);
     } catch (error: any) {
-      showMessage("error", error.response?.data?.message || "Lỗi khi xuất ratings CSV");
+      showMessage(
+        "error",
+        error.response?.data?.message || "Lỗi khi xuất ratings CSV"
+      );
     } finally {
       setExportLoading(false);
     }
@@ -244,7 +282,9 @@ export default function ManageScheduler() {
       setMessage(null);
 
       const result = await exportActivitiesToCSV();
-      const downloadUrl = `${import.meta.env.VITE_API_BASE_URL}/${result.filePath.replace(/\\/g, "/")}`;
+      const downloadUrl = `${
+        import.meta.env.VITE_API_BASE_URL
+      }/${result.filePath.replace(/\\/g, "/")}`;
 
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -256,7 +296,10 @@ export default function ManageScheduler() {
 
       showMessage("success", `Đã xuất và tải activities.csv thành công!`);
     } catch (error: any) {
-      showMessage("error", error.response?.data?.message || "Lỗi khi xuất activities CSV");
+      showMessage(
+        "error",
+        error.response?.data?.message || "Lỗi khi xuất activities CSV"
+      );
     } finally {
       setExportLoading(false);
     }
@@ -268,10 +311,18 @@ export default function ManageScheduler() {
       setMessage(null);
 
       const result = await importRecommendationsDefault();
-      showMessage("success", `Đã import ${result.imported} recommendations. ${result.errors > 0 ? `Có ${result.errors} lỗi.` : ""}`);
+      showMessage(
+        "success",
+        `Đã import ${result.imported} recommendations. ${
+          result.errors > 0 ? `Có ${result.errors} lỗi.` : ""
+        }`
+      );
       loadStats();
     } catch (error: any) {
-      showMessage("error", error.response?.data?.message || "Lỗi khi import recommendations");
+      showMessage(
+        "error",
+        error.response?.data?.message || "Lỗi khi import recommendations"
+      );
     } finally {
       setImportLoading(false);
     }
@@ -287,9 +338,9 @@ export default function ManageScheduler() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+      <h1 className="text-3xl font-bold text-foreground mb-8">
         <Clock className="w-6 h-6" />
-        Recommendation Quản Lý
+        Quản Lý Hệ thống khuyến nghị
       </h1>
 
       {/* Message */}
@@ -308,7 +359,7 @@ export default function ManageScheduler() {
       {/* Status Card */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-lg font-semibold mb-4">Trạng thái hiện tại</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-sm text-gray-600 mb-1">Trạng thái</p>
@@ -375,9 +426,13 @@ export default function ManageScheduler() {
             Tần suất
           </label>
           <div className="flex gap-4">
-            <label className={`flex items-center gap-2 px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
-              frequency === "daily" ? "bg-blue-50 border-blue-300" : "border-gray-200 hover:bg-gray-50"
-            }`}>
+            <label
+              className={`flex items-center gap-2 px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
+                frequency === "daily"
+                  ? "bg-blue-50 border-blue-300"
+                  : "border-gray-200 hover:bg-gray-50"
+              }`}
+            >
               <input
                 type="radio"
                 name="frequency"
@@ -388,9 +443,13 @@ export default function ManageScheduler() {
               />
               <span className="font-medium">Mỗi ngày</span>
             </label>
-            <label className={`flex items-center gap-2 px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
-              frequency === "weekly" ? "bg-blue-50 border-blue-300" : "border-gray-200 hover:bg-gray-50"
-            }`}>
+            <label
+              className={`flex items-center gap-2 px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
+                frequency === "weekly"
+                  ? "bg-blue-50 border-blue-300"
+                  : "border-gray-200 hover:bg-gray-50"
+              }`}
+            >
               <input
                 type="radio"
                 name="frequency"
@@ -463,7 +522,8 @@ export default function ManageScheduler() {
         {/* Schedule Preview */}
         <div className="mb-6 p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-blue-800">
-            <span className="font-medium">📅 Lịch chạy:</span> {getScheduleDescription()}
+            <span className="font-medium">📅 Lịch chạy:</span>{" "}
+            {getScheduleDescription()}
           </p>
         </div>
 
@@ -632,18 +692,35 @@ export default function ManageScheduler() {
 
       {/* Info Card */}
       <div className="bg-blue-50 rounded-lg p-6">
-        <h3 className="font-semibold text-blue-900 mb-2">ℹ️ Thông tin Pipeline</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">
+          ℹ️ Thông tin Pipeline
+        </h3>
         <ol className="text-sm text-blue-800 list-decimal list-inside space-y-1">
-          <li>Xuất <code className="bg-blue-100 px-1 rounded">items.csv</code> (activities) đến thư mục RCM</li>
-          <li>Xuất <code className="bg-blue-100 px-1 rounded">ratings.csv</code> đến thư mục RCM</li>
-          <li>Chạy Python script <code className="bg-blue-100 px-1 rounded">hybrid_cf_cb.py</code></li>
-          <li>Import <code className="bg-blue-100 px-1 rounded">recommendations.csv</code> vào database</li>
+          <li>
+            Xuất <code className="bg-blue-100 px-1 rounded">items.csv</code>{" "}
+            (activities) đến thư mục RCM
+          </li>
+          <li>
+            Xuất <code className="bg-blue-100 px-1 rounded">ratings.csv</code>{" "}
+            đến thư mục RCM
+          </li>
+          <li>
+            Chạy Python script{" "}
+            <code className="bg-blue-100 px-1 rounded">hybrid_cf_cb.py</code>
+          </li>
+          <li>
+            Import{" "}
+            <code className="bg-blue-100 px-1 rounded">
+              recommendations.csv
+            </code>{" "}
+            vào database
+          </li>
         </ol>
         <p className="text-xs text-blue-600 mt-3">
-          * Đảm bảo Python đã được cài đặt và các thư viện cần thiết (pandas, numpy, scikit-learn)
+          * Đảm bảo Python đã được cài đặt và các thư viện cần thiết (pandas,
+          numpy, scikit-learn)
         </p>
       </div>
     </div>
   );
 }
-

@@ -78,7 +78,7 @@ const AppRoutes = () => (
       <Route
         path="/profile"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute>  
             <Profile />
           </ProtectedRoute>
         }

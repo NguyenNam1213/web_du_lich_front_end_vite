@@ -1,6 +1,17 @@
 import React, { useState } from "react";
-import { Upload, FileText, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Download,
+} from "lucide-react";
 import paymentService from "../../../api/payment.service";
+import api from "../../../api/auth";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 interface ImportResult {
   message: string;
@@ -8,6 +19,7 @@ interface ImportResult {
   updated: number;
   errors: number;
   details: Array<{ bookingId: string; status: string; message: string }>;
+  exportFileName?: string | null;
 }
 
 export default function ManageTransactions() {
@@ -41,7 +53,9 @@ export default function ManageTransactions() {
     setResult(null);
 
     try {
-      const importResult = await paymentService.importTransactions(selectedFile);
+      const importResult = await paymentService.importTransactions(
+        selectedFile
+      );
       setResult(importResult);
     } catch (err: any) {
       setError(
@@ -53,13 +67,14 @@ export default function ManageTransactions() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-8">
           Quản lý giao dịch
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Import lịch sử giao dịch từ file CSV để tự động cập nhật trạng thái thanh toán
+          Import lịch sử giao dịch từ file CSV để tự động cập nhật trạng thái
+          thanh toán
         </p>
       </div>
 
@@ -148,6 +163,66 @@ export default function ManageTransactions() {
               </div>
             </div>
 
+            {result.exportFileName && result.updated > 0 && (
+              <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle
+                      size={20}
+                      className="text-green-600 dark:text-green-400"
+                    />
+                    <div>
+                      <div className="text-sm font-semibold text-green-800 dark:text-green-300">
+                        Đã xuất file danh sách thanh toán nhà cung cấp
+                      </div>
+                      <div className="text-xs text-green-700 dark:text-green-400">
+                        File: {result.exportFileName}
+                      </div>
+                    </div>
+                  </div>
+                  <a
+                    href={`${API_BASE_URL}/payments/download-supplier-payments/${result.exportFileName}`}
+                    download
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                    onClick={(e) => {
+                      // Thêm token vào header khi download
+                      const token = localStorage.getItem("access_token");
+                      if (token) {
+                        fetch(
+                          `${API_BASE_URL}/payments/download-supplier-payments/${result.exportFileName}`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                            },
+                          }
+                        )
+                          .then((res) => res.blob())
+                          .then((blob) => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download =
+                              result.exportFileName || "supplier-payments.csv";
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                          })
+                          .catch((err) => {
+                            console.error("Lỗi khi tải file:", err);
+                            alert("Lỗi khi tải file. Vui lòng thử lại.");
+                          });
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    <Download size={16} />
+                    Tải file CSV
+                  </a>
+                </div>
+              </div>
+            )}
+
             {result.details.length > 0 && (
               <div className="mt-4">
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -226,4 +301,3 @@ export default function ManageTransactions() {
     </div>
   );
 }
-

@@ -12,11 +12,20 @@ import {
 import { fetchCities } from "../../../store/slices/citySlice";
 import { RootState, AppDispatch } from "../../../store/index";
 import { Destination } from "../types/destination.type";
-import { Trash2, Edit2, X, Search } from "lucide-react";
+import {
+  Trash2,
+  Edit2,
+  X,
+  Search,
+  Upload,
+  Image as ImageIcon,
+} from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toastService } from "../../../utils/toast";
 import Pagination from "../components/pagination";
+import imageCompression from "browser-image-compression";
+import { DestinationService } from "../../../api/destination.service";
 
 export default function DestinationManagementTable() {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,7 +43,9 @@ export default function DestinationManagementTable() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deletingDestinationId, setDeletingDestinationId] = useState<string | null>(null);
+  const [deletingDestinationId, setDeletingDestinationId] = useState<
+    string | null
+  >(null);
   const [formData, setFormData] = useState<Partial<Destination>>({
     name: "",
     slug: "",
@@ -45,6 +56,13 @@ export default function DestinationManagementTable() {
     string | null
   >(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // States cho upload ảnh
+  const [uploading, setUploading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Filter destinations based on search term
   const filteredDestinations = destinations.filter((destination) => {
@@ -60,8 +78,13 @@ export default function DestinationManagementTable() {
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedDestinations = filteredDestinations.slice(startIndex, endIndex);
-  const totalFilteredPages = Math.ceil(filteredDestinations.length / ITEMS_PER_PAGE);
+  const paginatedDestinations = filteredDestinations.slice(
+    startIndex,
+    endIndex
+  );
+  const totalFilteredPages = Math.ceil(
+    filteredDestinations.length / ITEMS_PER_PAGE
+  );
 
   useEffect(() => {
     if (status === "idle") {
@@ -87,6 +110,8 @@ export default function DestinationManagementTable() {
   const handleEdit = (destination: Destination) => {
     setFormData({ ...destination });
     setEditingDestinationId(destination.id);
+    setPreviewUrl(destination.imageUrl || "");
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
@@ -98,23 +123,35 @@ export default function DestinationManagementTable() {
       imageUrl: "",
     });
     setEditingDestinationId(null);
+    setPreviewUrl("");
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
   const handleSave = async () => {
     if (formData.name && formData.slug && formData.cityId) {
+      // Chỉ gửi các trường hợp lệ, loại bỏ các trường không được phép
+      const validData: Partial<Destination> = {
+        name: formData.name,
+        slug: formData.slug,
+        cityId: formData.cityId,
+        imageUrl: formData.imageUrl || undefined,
+      };
+
       if (editingDestinationId) {
         await dispatch(
           updateDestinationAsync({
             id: editingDestinationId,
-            destinationData: formData,
+            destinationData: validData,
           })
         );
       } else {
-        await dispatch(createDestinationAsync(formData));
+        await dispatch(createDestinationAsync(validData));
       }
       setIsModalOpen(false);
       setFormData({ name: "", slug: "", cityId: "", imageUrl: "" });
+      setPreviewUrl("");
+      setSelectedFile(null);
       setEditingDestinationId(null);
       dispatch(fetchDestinations());
     }
@@ -127,7 +164,7 @@ export default function DestinationManagementTable() {
 
   const handleDeleteConfirm = async () => {
     if (!deletingDestinationId) return;
-    
+
     try {
       await dispatch(deleteDestinationAsync(deletingDestinationId));
       dispatch(fetchDestinations());
@@ -136,6 +173,104 @@ export default function DestinationManagementTable() {
       setDeletingDestinationId(null);
     } catch (error) {
       toastService.error("Xóa điểm đến thất bại!");
+    }
+  };
+
+  // Xử lý chọn file ảnh
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toastService.error("Vui lòng chọn file ảnh");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toastService.error("Kích thước ảnh không được vượt quá 10MB");
+      return;
+    }
+
+    try {
+      setCompressing(true);
+
+      // Cấu hình nén ảnh
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: file.type,
+      };
+
+      const compressedFile = await imageCompression(file, options);
+
+      console.log(`Kích thước gốc: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      console.log(
+        `Kích thước sau nén: ${(compressedFile.size / 1024 / 1024).toFixed(
+          2
+        )}MB`
+      );
+
+      setSelectedFile(compressedFile);
+
+      // Tạo preview URL từ file đã nén
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (error) {
+      console.error("Lỗi nén ảnh:", error);
+      toastService.error("Không thể xử lý ảnh. Vui lòng thử ảnh khác.");
+    } finally {
+      setCompressing(false);
+    }
+  };
+
+  // Upload ảnh lên server
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    try {
+      setUploading(true);
+      setUploadProgress(0);
+
+      const res = await DestinationService.uploadImage(
+        selectedFile,
+        (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 100)
+          );
+          setUploadProgress(percentCompleted);
+        }
+      );
+
+      const uploadedUrl = res.data.url;
+      setFormData({ ...formData, imageUrl: uploadedUrl });
+      setPreviewUrl(uploadedUrl);
+
+      toastService.success("✅ Tải ảnh lên thành công!");
+    } catch (err: any) {
+      console.error(err);
+
+      // Xử lý các loại lỗi khác nhau
+      if (err.code === "ECONNABORTED") {
+        toastService.error(
+          "⏱️ Upload quá lâu (>30s). Vui lòng:\n" +
+            "1. Chọn ảnh có kích thước nhỏ hơn\n" +
+            "2. Kiểm tra kết nối mạng\n" +
+            "3. Thử lại sau"
+        );
+      } else if (err.response?.status === 413) {
+        toastService.error("❌ File quá lớn. Vui lòng chọn ảnh nhỏ hơn.");
+      } else if (err.response?.status === 500) {
+        toastService.error("❌ Lỗi server. Vui lòng liên hệ quản trị viên.");
+      } else {
+        toastService.error("❌ Tải ảnh lên thất bại. Vui lòng thử lại.");
+      }
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -204,45 +339,49 @@ export default function DestinationManagementTable() {
             {paginatedDestinations.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                  {searchTerm ? "Không tìm thấy kết quả" : "Không có điểm đến nào"}
+                  {searchTerm
+                    ? "Không tìm thấy kết quả"
+                    : "Không có điểm đến nào"}
                 </td>
               </tr>
             ) : (
               paginatedDestinations.map((destination: Destination) => (
-              <tr
-                key={destination.id}
-                className="border-b border-gray-200 hover:bg-gray-50"
-              >
-                <td className="px-6 py-3 text-sm">{destination.id}</td>
-                <td className="px-6 py-3 text-sm font-medium">
-                  {destination.name}
-                </td>
-                <td className="px-6 py-3 text-sm text-gray-600">
-                  {destination.slug}
-                </td>
-                <td className="px-6 py-3 text-sm">
-                  {destination.city?.name || "-"}
-                </td>
-                <td className="px-6 py-3 text-sm">
-                  {new Date(destination.createdAt).toLocaleDateString("vi-VN")}
-                </td>
-                <td className="px-6 py-3 text-sm text-center">
-                  <button
-                    onClick={() => handleEdit(destination)}
-                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Chỉnh sửa"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(destination.id)}
-                    className="p-2 text-gray-500 hover:bg-gray-100 hover:text-red-600 rounded-lg transition-colors"
-                    title="Xóa"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </td>
-              </tr>
+                <tr
+                  key={destination.id}
+                  className="border-b border-gray-200 hover:bg-gray-50"
+                >
+                  <td className="px-6 py-3 text-sm">{destination.id}</td>
+                  <td className="px-6 py-3 text-sm font-medium">
+                    {destination.name}
+                  </td>
+                  <td className="px-6 py-3 text-sm text-gray-600">
+                    {destination.slug}
+                  </td>
+                  <td className="px-6 py-3 text-sm">
+                    {destination.city?.name || "-"}
+                  </td>
+                  <td className="px-6 py-3 text-sm">
+                    {new Date(destination.createdAt).toLocaleDateString(
+                      "vi-VN"
+                    )}
+                  </td>
+                  <td className="px-6 py-3 text-sm text-center">
+                    <button
+                      onClick={() => handleEdit(destination)}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="Chỉnh sửa"
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(destination.id)}
+                      className="p-2 text-gray-500 hover:bg-gray-100 hover:text-red-600 rounded-lg transition-colors"
+                      title="Xóa"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>
@@ -361,17 +500,79 @@ export default function DestinationManagementTable() {
 
                   <div>
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      URL Hình Ảnh (Optional)
+                      Hình Ảnh
                     </label>
-                    <input
-                      type="text"
-                      value={formData.imageUrl || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, imageUrl: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors"
-                      placeholder="https://example.com/image.jpg"
-                    />
+
+                    {/* Preview ảnh */}
+                    {(previewUrl || formData.imageUrl) && (
+                      <div className="mb-3">
+                        <img
+                          src={previewUrl || formData.imageUrl || ""}
+                          alt="Preview"
+                          className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                        />
+                      </div>
+                    )}
+
+                    {/* Upload ảnh */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition text-sm">
+                          <ImageIcon size={16} />
+                          {compressing ? "Đang nén..." : "Chọn ảnh"}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            className="hidden"
+                            disabled={compressing || uploading}
+                          />
+                        </label>
+
+                        {selectedFile && (
+                          <button
+                            onClick={handleUpload}
+                            disabled={uploading || compressing}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          >
+                            <Upload size={16} />
+                            {uploading ? "Đang tải..." : "Tải lên"}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Progress bar */}
+                      {uploading && uploadProgress > 0 && (
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                      )}
+
+                      {/* Input URL thủ công (fallback) */}
+                      <div className="mt-2">
+                        <label className="block text-xs font-medium mb-1 text-gray-600">
+                          Hoặc nhập URL ảnh:
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.imageUrl || ""}
+                          onChange={(e) => {
+                            setFormData({
+                              ...formData,
+                              imageUrl: e.target.value,
+                            });
+                            if (e.target.value) {
+                              setPreviewUrl(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors text-sm"
+                          placeholder="https://example.com/image.jpg"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -440,8 +641,8 @@ export default function DestinationManagementTable() {
 
                 <div className="px-6 py-4 space-y-4">
                   <p className="text-sm text-gray-700">
-                    Bạn có chắc chắn muốn xóa điểm đến này không? Hành động này không
-                    thể hoàn tác.
+                    Bạn có chắc chắn muốn xóa điểm đến này không? Hành động này
+                    không thể hoàn tác.
                   </p>
                 </div>
 

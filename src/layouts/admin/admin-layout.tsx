@@ -41,22 +41,29 @@ export default function AdminLayout({
     load();
     const id = setInterval(load, 30000);
     const handler = () => load();
-    window.addEventListener('notifications:updated', handler);
+    window.addEventListener("notifications:updated", handler);
     return () => {
       mounted = false;
       clearInterval(id);
-      window.removeEventListener('notifications:updated', handler);
+      window.removeEventListener("notifications:updated", handler);
     };
   }, []);
 
   return (
     <div>
-      <Navbar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} hasUnread={hasUnread} />
+      <Navbar
+        onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+        hasUnread={hasUnread}
+      />
 
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} unreadNotifications={hasUnread} />
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        unreadNotifications={hasUnread}
+      />
 
       <div className="p-4 sm:ml-64 bg-white">
-        <div style={{ paddingTop: "60px" }}>
+        <div style={{ paddingTop: "" }}>
           <Outlet />
         </div>
       </div>
