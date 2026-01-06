@@ -55,52 +55,52 @@ export const getUsersIcon = () => (
 
 export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
   {
-    label: "Dashboard",
+    label: "Tổng quan",
     href: "/admin/dashboard",
     icon: getDashboardIcon(),
   },
   {
-    label: "Users",
+    label: "Người dùng",
     href: "/admin/user",
     icon: getUsersIcon(),
   },
+  // {
+  //   label: "Supplier",
+  //   href: "/admin/supplier",
+  //   icon: <User className="text-gray-700 w-5 h-5" />,
+  // },
   {
-    label: "Supplier",
-    href: "/admin/supplier",
-    icon: <User className="text-gray-700 w-5 h-5" />,
-  },
-  {
-    label: "Request Supplier",
+    label: "Yêu cầu",
     href: "/admin/request-supplier",
     icon: <MessageSquare className="text-gray-700 w-5 h-5" />,
   },
   {
-    label: "Country",
+    label: "Quốc gia",
     href: "/admin/country",
     icon: <Flag className="text-gray-700 w-5 h-5" />,
   },
   {
-    label: "City",
+    label: "Thành phố",
     href: "/admin/city",
     icon: <Building2 className="text-gray-700 w-5 h-5" />,
   },
   {
-    label: "Destination",
+    label: "Điểm đến",
     href: "/admin/destinations",
     icon: <MapPin className="text-gray-700 w-5 h-5" />,
   },
-  {
-    label: "Activity",
-    href: "/admin/activities",
-    icon: <Film className="text-gray-700 w-5 h-5" />,
-  },
+  // {
+  //   label: "Activity",
+  //   href: "/admin/activities",
+  //   icon: <Film className="text-gray-700 w-5 h-5" />,
+  // },
   {
     label: "Booking",
     href: "/admin/booking",
     icon: <Calendar className="text-gray-700 w-5 h-5" />,
   },
   {
-    label: "Reviews",
+    label: "Đánh giá",
     href: "/admin/reviews",
     icon: <Star className="text-gray-700 w-5 h-5" />,
   },
@@ -111,7 +111,7 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
   // },
 
   {
-    label: "Recommendation Quản Lý",
+    label: "Hệ thống đề xuất",
     href: "/admin/scheduler",
     icon: <Clock className="text-gray-700 w-5 h-5" />,
   },
@@ -128,12 +128,12 @@ export const getNavItems = (unreadNotifications: boolean): NavItem[] => [
   //   ),
   // },
   {
-    label: "Transactions",
+    label: "Giao dịch",
     href: "/admin/transactions",
     icon: <CreditCard className="text-gray-700 w-5 h-5" />,
   },
   {
-    label: "Coupons",
+    label: "Mã giảm giá",
     href: "/admin/coupon",
     icon: <Ticket className="text-gray-700 w-5 h-5" />,
   },
