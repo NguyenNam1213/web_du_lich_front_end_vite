@@ -4,6 +4,7 @@ import DealsAndHighLights from "../components/DealsAndHighlights/DealsAndHighLig
 import TourList from "../components/Activity/TourList";
 import RecommendedTours from "../components/Activity/RecommendedTours";
 import TopRatedTours from "../components/Activity/TopRatedTours";
+import SuggestedTours from "../components/Activity/SuggestedTours";
 const Home = () => {
   return (
     <div>
@@ -11,8 +12,9 @@ const Home = () => {
       <Background></Background>
       <DealsAndHighLights></DealsAndHighLights>
       <TourList></TourList>
-      <RecommendedTours></RecommendedTours>
+      {/* <RecommendedTours></RecommendedTours> */}
       <TopRatedTours></TopRatedTours>
+      <SuggestedTours></SuggestedTours>
     </div>
   );
 };
