@@ -77,9 +77,7 @@ const Login = () => {
 
         <div className="forgot-password">
           Quên mật khẩu?{" "}
-          <span onClick={() => navigate("/account-settings")}>
-            Nhấn vào đây
-          </span>
+          <span onClick={() => navigate("/forgot-password")}>Nhấn vào đây</span>
         </div>
 
         <div className="submit-container">

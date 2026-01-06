@@ -12,24 +12,26 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
+    if (loading) return;
+    setLoading(true); 
     try {
       const res = await register(email, password);
-
       if (res.data?.access_token) {
         localStorage.setItem("access_token", res.data.access_token);
-        await fetchProfile();
-        console.log("FETCH PROFILE DONE");
-        alert("Đăng ký thành công");
+        alert("Đăng ký thành công!");
+        fetchProfile();
         navigate("/");
       }
     } catch (err) {
       console.error(err.response?.data || err);
-      alert("Email đã tồn tại hoặc lỗi server");
+      alert(err.response?.data?.message || "Đã có lỗi xảy ra");
+    } finally {
+      setLoading(false); 
     }
   };
-
 
   const handleToLogin = () => {
     navigate("/login");

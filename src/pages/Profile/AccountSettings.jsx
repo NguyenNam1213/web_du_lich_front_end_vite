@@ -40,11 +40,7 @@ const AccountSettings = () => {
        setMessage(err.response?.data?.message || "Đổi mật khẩu thất bại");
      }
   };
-
-  const handleSaveNotifications = () => {
-    alert("Đã lưu tùy chỉnh thông báo!");
-  };
-
+  
   return (
     <div className="settings-container">
       <ProfileSidebar userData={userData}/>
@@ -88,74 +84,6 @@ const AccountSettings = () => {
           </button>
 
           {message && <p className="message">{message}</p>}
-        </div>
-        <div className="settings-box">
-          <h3>Tùy chỉnh thông báo</h3>
-          <p>Bạn muốn nhận những thông báo nào?</p>
-
-          <div className="notify-section">
-            <h4>Cập nhật và Ưu đãi</h4>
-            <label>
-              <input
-                type="checkbox"
-                checked={notifications.promoEmail}
-                onChange={(e) =>
-                  setNotifications((prev) => ({
-                    ...prev,
-                    promoEmail: e.target.checked,
-                  }))
-                }
-              />{" "}
-              Email
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={notifications.promoSMS}
-                onChange={(e) =>
-                  setNotifications((prev) => ({
-                    ...prev,
-                    promoSMS: e.target.checked,
-                  }))
-                }
-              />{" "}
-              SMS
-            </label>
-
-            <h4>Nhắc nhở</h4>
-            <label>
-              <input
-                type="checkbox"
-                checked={notifications.reminderEmail}
-                onChange={(e) =>
-                  setNotifications((prev) => ({
-                    ...prev,
-                    reminderEmail: e.target.checked,
-                  }))
-                }
-              />{" "}
-              Email
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={notifications.reminderSMS}
-                onChange={(e) =>
-                  setNotifications((prev) => ({
-                    ...prev,
-                    reminderSMS: e.target.checked,
-                  }))
-                }
-              />{" "}
-              SMS
-            </label>
-          </div>
-
-          <div className="button-group">
-            <button className="save-btn" onClick={handleSaveNotifications}>
-              Lưu
-            </button>
-          </div>
         </div>
       </div>
     </div>
