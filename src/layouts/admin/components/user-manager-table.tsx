@@ -82,15 +82,24 @@ export default function UserManagementTable() {
   });
 
   const ITEMS_PER_PAGE = 10;
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-  const totalFilteredPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+
+  // Nếu có search, phân trang local. Nếu không có search, dùng trực tiếp users từ API (đã được phân trang)
+  const paginatedUsers = searchTerm
+    ? (() => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        return filteredUsers.slice(startIndex, endIndex);
+      })()
+    : users; // Dùng trực tiếp users từ API khi không có search
+
+  const totalFilteredPages = searchTerm
+    ? Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
+    : totalPages; // Dùng totalPages từ API khi không có search
 
   // Lấy danh sách người dùng khi component mount
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchUsers({ page: 1 }));
+      dispatch(fetchUsers({ page: 1, limit: ITEMS_PER_PAGE }));
     }
   }, [dispatch, status]);
 
@@ -148,7 +157,7 @@ export default function UserManagementTable() {
 
   const handleDeleteConfirm = async () => {
     if (!deletingUserId) return;
-    
+
     try {
       await dispatch(deleteUserAsync(deletingUserId));
       dispatch(fetchUsers({ page: currentPage }));
@@ -306,58 +315,66 @@ export default function UserManagementTable() {
             </tr>
           </thead>
           <tbody>
-            {paginatedUsers.length === 0 ? (
+            {status === "loading" ? (
               <tr>
                 <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                  {searchTerm ? "Không tìm thấy kết quả" : "Không có người dùng nào"}
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            ) : paginatedUsers.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                  {searchTerm
+                    ? "Không tìm thấy kết quả"
+                    : "Không có người dùng nào"}
                 </td>
               </tr>
             ) : (
               paginatedUsers.map((user: User) => (
-              <tr
-                key={user.id}
-                className="border-b border-gray-200 hover:bg-gray-50"
-              >
-                <td className="px-6 py-3 text-sm">{user.id}</td>
-                <td className="px-6 py-3 text-sm">{user.firstName || ""}</td>
-                <td className="px-6 py-3 text-sm">{user.lastName || ""}</td>
-                <td className="px-6 py-3 text-sm">{user.email}</td>
-                <td className="px-6 py-3 text-sm">{user.phone || ""}</td>
-                <td className="px-6 py-3 text-sm">
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${getRoleColor(
-                      user.role
-                    )}`}
-                  >
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-6 py-3 text-sm">
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                      user.status
-                    )}`}
-                  >
-                    {user.status}
-                  </span>
-                </td>
-                <td className="px-6 py-3 text-sm text-center">
-                  <button
-                    onClick={() => handleEdit(user)}
-                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Chỉnh sửa"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user.id)}
-                    className="p-2 text-gray-500 hover:bg-gray-100 hover:text-red-600 rounded-lg transition-colors"
-                    title="Xóa"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </td>
-              </tr>
+                <tr
+                  key={user.id}
+                  className="border-b border-gray-200 hover:bg-gray-50"
+                >
+                  <td className="px-6 py-3 text-sm">{user.id}</td>
+                  <td className="px-6 py-3 text-sm">{user.firstName || ""}</td>
+                  <td className="px-6 py-3 text-sm">{user.lastName || ""}</td>
+                  <td className="px-6 py-3 text-sm">{user.email}</td>
+                  <td className="px-6 py-3 text-sm">{user.phone || ""}</td>
+                  <td className="px-6 py-3 text-sm">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${getRoleColor(
+                        user.role
+                      )}`}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
+                  <td className="px-6 py-3 text-sm">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
+                        user.status
+                      )}`}
+                    >
+                      {user.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-3 text-sm text-center">
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="Chỉnh sửa"
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      className="p-2 text-gray-500 hover:bg-gray-100 hover:text-red-600 rounded-lg transition-colors"
+                      title="Xóa"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>
@@ -365,11 +382,17 @@ export default function UserManagementTable() {
       </div>
 
       {/* Thanh phân trang */}
-      <Pagination 
-        currentPage={currentPage} 
+      <Pagination
+        currentPage={currentPage}
         totalPages={searchTerm ? totalFilteredPages : totalPages}
         onPageChange={(page) => {
-          dispatch(setCurrentPage(page));
+          if (!searchTerm) {
+            // Nếu không có search, fetch dữ liệu từ API
+            dispatch(fetchUsers({ page, limit: ITEMS_PER_PAGE }));
+          } else {
+            // Nếu có search, chỉ cập nhật currentPage để filter local
+            dispatch(setCurrentPage(page));
+          }
         }}
       />
 
@@ -587,8 +610,8 @@ export default function UserManagementTable() {
 
                 <div className="px-6 py-4 space-y-4">
                   <p className="text-sm text-gray-700">
-                    Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không
-                    thể hoàn tác.
+                    Bạn có chắc chắn muốn xóa người dùng này không? Hành động
+                    này không thể hoàn tác.
                   </p>
                 </div>
 
