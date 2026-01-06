@@ -55,4 +55,5 @@ export interface BookingCreateDto {
   discount: number;
   total: number;
   currency: string;
+  status: BookingStatus;
 }

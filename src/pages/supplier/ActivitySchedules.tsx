@@ -9,6 +9,7 @@ import { ActivityScheduleService } from "../../api/activitySchedule.service";
 import { ActivityService } from "../../api/activity.service";
 import { ActivitySchedule } from "../../types/activitySchedule";
 import { Activity } from "../../types/activity";
+import Pagination from "../../components/Supplier/Pagination";
 
 function ActivitySchedules() {
   const [schedules, setSchedules] = useState<ActivitySchedule[]>([]);
@@ -31,6 +32,9 @@ function ActivitySchedules() {
 
   const [openDropdown, setOpenDropdown] = useState(false);
   const [search, setSearch] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   // 🔹 Hàm định dạng ngày từ ISO -> dd/mm/yyyy
   const formatDate = (isoString?: string) => {
@@ -65,6 +69,13 @@ function ActivitySchedules() {
     }
   };
 
+  const totalPages = Math.ceil(schedules.length / pageSize);
+
+  const paginatedSchedules = schedules.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   useEffect(() => {
     fetchActivities();
   }, []);
@@ -78,6 +89,10 @@ function ActivitySchedules() {
       setActivityId(activities[0].id); 
     }
   }, [activities]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [schedules]);
 
   const handleSave = async () => {
     if (!activityId) return alert("Vui lòng chọn activity");
@@ -223,7 +238,7 @@ function ActivitySchedules() {
               </tr>
             </thead>
             <tbody>
-              {schedules.map((sch) => (
+              {paginatedSchedules.map((sch) => (
                 <tr key={sch.id} className="border-t hover:bg-gray-50">
                   <td className="py-3 px-4 font-medium">{sch.id}</td>
                   <td className="py-3 px-4">{sch.timeSlot || "-"}</td>
@@ -261,6 +276,12 @@ function ActivitySchedules() {
           </table>
         </div>
       )}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {!loading && schedules.length === 0 && activityId && (
         <p className="text-gray-600 mt-4">

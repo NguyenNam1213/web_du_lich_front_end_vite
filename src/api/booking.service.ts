@@ -11,9 +11,7 @@ export interface UpdateBookingStatusDto {
 const BASE_URL = "/supplier/bookings";
 
 export const BookingService = {
-  // ===========================
   // SUPPLIER (instance)
-  // ===========================
   getAll(): Promise<AxiosResponse<Booking[]>> {
     return instance.get(BASE_URL);
   },
@@ -30,9 +28,7 @@ export const BookingService = {
     return instance.delete(`${BASE_URL}/${id}`);
   },
 
-  // ===========================
   // USER (api)
-  // ===========================
   createBooking(payload: BookingCreateDto) {
     return instance.post(BASE_URL, payload);
 

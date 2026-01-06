@@ -90,15 +90,6 @@ const Profile = () => {
           )}
         </div>
 
-        <div className="info-row">
-          <span>Số dư tài khoản</span>
-          <p>
-            {userData.balance
-              ? userData.balance.toLocaleString("vi-VN") + " VNĐ"
-              : "0 VNĐ"}
-          </p>
-        </div>
-
         <div className="button-group">
           {edit ? (
             <button className="save-btn" onClick={handleSave}>
