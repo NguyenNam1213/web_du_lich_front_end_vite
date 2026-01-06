@@ -1,10 +1,15 @@
+import { useDispatch } from "react-redux";
 import { ActivitySchedule } from "../../types/activitySchedule";
+import { setTourSchedules } from "../../store/slices/tourSchedulesSlice";
+import { useEffect } from "react";
 
 interface TourSchedulesProps {
   schedules?: ActivitySchedule[];
 }
 
 const TourSchedules = ({ schedules }: TourSchedulesProps) => {
+  const dispatch = useDispatch();
+
   const safeParse = (val?: string | null): Date | null => {
     if (!val) return null;
 
@@ -32,6 +37,50 @@ const TourSchedules = ({ schedules }: TourSchedulesProps) => {
 
     return scheduleDay.getTime() >= today.getTime();
   });
+
+  useEffect(() => {
+    if (!upcomingSchedules) return;
+
+    const rows = upcomingSchedules.map((schedule) => {
+      const startDate = safeParse(schedule.startTime ?? schedule.date);
+
+      const dateISO =
+        startDate instanceof Date && !isNaN(startDate.getTime())
+          ? startDate.toISOString().split("T")[0]
+          : "";
+
+      return {
+        id: String(schedule.id),
+
+        dateISO,
+
+        dateLabel:
+          startDate instanceof Date && !isNaN(startDate.getTime())
+            ? startDate.toLocaleDateString("vi-VN", {
+                timeZone: "Asia/Bangkok",
+              })
+            : "—",
+
+        startTime:
+          startDate instanceof Date && !isNaN(startDate.getTime())
+            ? startDate.toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+                timeZone: "Asia/Bangkok",
+              })
+            : "—",
+
+        available:
+          Number(schedule.availableSpots) -
+          Number(schedule.bookedSpots || 0),
+
+        total: Number(schedule.availableSpots),
+      };
+    });
+
+    dispatch(setTourSchedules(rows));
+  }, [upcomingSchedules, dispatch]);
 
   if (!upcomingSchedules || upcomingSchedules.length === 0) {
     return (

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BookingService } from "../../api/booking.service";
 import { Booking } from "../../types/booking";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
+import Pagination from "../../components/Supplier/Pagination";
 
 const BookingTable = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -13,6 +14,8 @@ const BookingTable = () => {
     paymentStatus: "" as Booking["paymentStatus"],
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -28,6 +31,17 @@ const BookingTable = () => {
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [bookings]);
+
+  const totalPages = Math.ceil(bookings.length / pageSize);
+
+  const paginatedBookings = bookings.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const handleDelete = async (id: number) => {
     if (!confirm("Bạn có chắc chắn muốn xóa booking này không?")) return;
@@ -108,7 +122,7 @@ const BookingTable = () => {
           </thead>
           <tbody>
             {bookings.length > 0 ? (
-              bookings.map((b) => (
+              paginatedBookings.map((b) => (
                 <tr
                   key={b.id}
                   className="border-t hover:bg-gray-50 transition-all"
@@ -187,6 +201,12 @@ const BookingTable = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {/* Dialog chỉnh sửa */}
       {isDialogOpen && selectedBooking && (

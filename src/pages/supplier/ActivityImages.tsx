@@ -11,6 +11,7 @@ import { ActivityImageService } from "../../api/activityImage.service";
 import { ActivityService } from "../../api/activity.service";
 import { ActivityImage } from "../../types/activityImage";
 import { Activity } from "../../types/activity";
+import Pagination from "../../components/Supplier/Pagination";
 
 function ActivityImages() {
   const [images, setImages] = useState<ActivityImage[]>([]);
@@ -29,7 +30,10 @@ function ActivityImages() {
   const [openDropdown, setOpenDropdown] = useState(false);
   const [search, setSearch] = useState("");
 
-  // 🆕 States cho upload
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  // States cho upload
   const [uploading, setUploading] = useState(false);
   const [compressing, setCompressing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -59,6 +63,13 @@ function ActivityImages() {
     }
   };
 
+  const totalPages = Math.ceil(images.length / pageSize);
+
+  const paginatedImages = images.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   useEffect(() => {
     fetchActivities();
   }, []);
@@ -72,6 +83,10 @@ function ActivityImages() {
       setActivityId(activities[0].id);
     }
   }, [activities]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [images]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -315,7 +330,7 @@ function ActivityImages() {
               </tr>
             </thead>
             <tbody>
-              {images.map((img) => (
+              {paginatedImages.map((img) => (
                 <tr
                   key={img.id}
                   className="border-t hover:bg-gray-50 transition"
@@ -358,6 +373,12 @@ function ActivityImages() {
           </table>
         </div>
       )}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {!loading && images.length === 0 && activityId && (
         <p className="text-gray-600 mt-4">
