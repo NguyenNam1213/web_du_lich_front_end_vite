@@ -55,5 +55,6 @@ export interface BookingCreateDto {
   discount: number;
   total: number;
   currency: string;
+  couponCode?: string; // Mã giảm giá (backend sẽ tính lại discount từ couponCode)
   status: BookingStatus;
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CouponService, Coupon } from "../../api/coupon.service";
+import { BookingService } from "../../api/booking.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import {
@@ -12,7 +13,7 @@ const ApplyCoupon: React.FC = () => {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [couponList, setCouponList] = useState<Coupon[]>([]); 
+  const [couponList, setCouponList] = useState<Coupon[]>([]);
   const [listLoading, setListLoading] = useState(true);
 
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const ApplyCoupon: React.FC = () => {
     const fetchCoupons = async () => {
       try {
         const res = await CouponService.listActive();
-        setCouponList(res.data); 
+        setCouponList(res.data);
       } catch (e) {
         console.error("Failed to fetch coupons:", e);
       } finally {
@@ -31,7 +32,6 @@ const ApplyCoupon: React.FC = () => {
     };
     fetchCoupons();
   }, []);
-
 
   const formatDiscount = (coupon: Coupon): string => {
     const value = coupon.discountValue
@@ -53,12 +53,28 @@ const ApplyCoupon: React.FC = () => {
 
     try {
       setLoading(true);
-      const res = await CouponService.apply(couponCode, originalAmount);
-      const discountValue = res.data.discount;
-      const finalTotal = res.data.finalAmount;
-      dispatch(setCouponCode(couponCode));
-      dispatch(setDiscount(discountValue ?? 0));
-      dispatch(setAmount(finalTotal)); 
+
+      // Nếu có bookingId, cập nhật booking với coupon code
+      if (checkout.bookingId) {
+        const bookingRes = await BookingService.applyCoupon(
+          checkout.bookingId,
+          couponCode
+        );
+        const updatedBooking = bookingRes.data;
+
+        dispatch(setCouponCode(couponCode));
+        dispatch(setDiscount(Number(updatedBooking.discount)));
+        dispatch(setAmount(Number(updatedBooking.total)));
+      } else {
+        // Nếu chưa có booking, chỉ validate coupon
+        const res = await CouponService.apply(couponCode, originalAmount);
+        const discountValue = res.data.discount;
+        const finalTotal = res.data.finalAmount;
+        dispatch(setCouponCode(couponCode));
+        dispatch(setDiscount(discountValue ?? 0));
+        dispatch(setAmount(finalTotal));
+      }
+
       if (couponCode !== code) setCode(couponCode);
       setError("");
     } catch (err: any) {
@@ -69,7 +85,6 @@ const ApplyCoupon: React.FC = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <div>

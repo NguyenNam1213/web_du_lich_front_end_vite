@@ -37,4 +37,9 @@ export const BookingService = {
   getMyBooking() {
     return api.get(`${BASE_URL}/my-booking`);
   },
+
+  // Áp dụng coupon code cho booking
+  applyCoupon(id: number, couponCode: string) {
+    return api.patch(`${BASE_URL}/${id}/coupon`, { couponCode });
+  },
 };

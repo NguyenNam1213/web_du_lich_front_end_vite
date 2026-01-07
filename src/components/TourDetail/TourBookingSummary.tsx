@@ -7,6 +7,7 @@ import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { useSearchParams } from "react-router-dom";
 
 interface TourBookingSummaryProps {
   tour?: Activity;
@@ -20,9 +21,11 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
   const schedules = useSelector(
     (state: RootState) => state.tourSchedules.rows
   );
+  const checkout = useSelector((state: RootState) => state.checkout);
 
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 2); 
@@ -72,6 +75,9 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
     setError("");
 
     try {
+      // Lấy couponCode từ URL params hoặc checkout state
+      const couponCode = searchParams.get('coupon') || checkout.couponCode || undefined;
+      
       const payLoad = {
         activityId: Number(tour.id),
         supplierId: Number(tour.supplier?.id),
@@ -87,9 +93,10 @@ export const TourBookingSummary: React.FC<TourBookingSummaryProps> = ({ tour }) 
         participants: participants,
 
         subtotal: tour.price * participants,
-        discount: 0,
-        total: tour.price * participants,
+        discount: 0, // Backend sẽ tính lại discount từ couponCode
+        total: tour.price * participants, // Backend sẽ tính lại total từ subtotal - discount
         currency: tour.currency,
+        couponCode: couponCode, // Gửi couponCode để backend tính discount
         bookingStatus,
       };
 
